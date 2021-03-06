@@ -1414,9 +1414,10 @@ Fixpoint plus' (n : nat) (m : nat) : nat :=
     out your solution so that it doesn't cause Coq to reject the whole
     file!) *)
 
-(* FILL IN HERE
-
-    [] *)
+(* Fixpoint div(n m: nat) :=
+  if ltb n m
+  then 0
+  else 1 + div (n - m) m. *)
 
 (* ################################################################# *)
 (** * More Exercises *)
