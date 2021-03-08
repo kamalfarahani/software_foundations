@@ -242,8 +242,13 @@ Fixpoint double (n:nat) :=
 (** Use induction to prove this simple fact about [double]: *)
 
 Lemma double_plus : forall n, double n = n + n .
-Proof.
-  (* FILL IN HERE *) Admitted.
+Proof. intros n. induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - simpl.
+    rewrite -> IHn'.
+    rewrite -> plus_n_Sm.
+    reflexivity. Qed.
+ 
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (evenb_S) 
