@@ -260,10 +260,22 @@ Proof. intros n. induction n as [| n' IHn'].
     alternative characterization of [evenb (S n)] that works better
     with induction: *)
 
+Lemma double_neg_is_same: forall b : bool,
+  negb (negb b) = b.
+Proof. intros b. destruct b eqn:E.
+  - reflexivity.
+  - reflexivity.
+Qed.
+
 Theorem evenb_S : forall n : nat,
   evenb (S n) = negb (evenb n).
-Proof.
-  (* FILL IN HERE *) Admitted.
+Proof. intros n. induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - rewrite -> IHn'.
+    simpl. rewrite -> double_neg_is_same.
+    reflexivity.
+Qed.
+
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (destruct_induction) 
