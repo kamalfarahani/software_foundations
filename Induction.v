@@ -511,7 +511,14 @@ Definition manual_grade_for_plus_comm_informal : option (nat*string) := None.
 Theorem plus_swap : forall n m p : nat,
   n + (m + p) = m + (n + p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m p.
+  assert (m + p = p + m) as H.
+  { rewrite -> plus_comm. reflexivity. }
+  rewrite -> H.
+  rewrite -> plus_assoc.
+  rewrite -> plus_comm.
+  reflexivity.
+Qed.
 
 (** Now prove commutativity of multiplication.  You will probably
     want to define and prove a "helper" theorem to be used
