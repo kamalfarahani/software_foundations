@@ -524,10 +524,39 @@ Qed.
     want to define and prove a "helper" theorem to be used
     in the proof of this one. Hint: what is [n * (1 + k)]? *)
 
+Lemma plus_S_n_m: forall n m : nat,
+  S (n + m) = n + S m.
+Proof.
+  intros n m.
+  induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - simpl. rewrite -> IHn'. reflexivity.
+Qed.
+
+Lemma mult_n_Sk: forall n k : nat,
+  n * (S k) = n * k + n.
+Proof.
+  intros n k.
+  induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - simpl. rewrite -> IHn'.
+    rewrite -> plus_S_n_m.
+    rewrite -> plus_S_n_m.
+    rewrite -> plus_assoc.
+    reflexivity.
+Qed.
+
 Theorem mult_comm : forall m n : nat,
   m * n = n * m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m.
+  induction n as [| n' IHn'].
+  - simpl. rewrite -> mult_0_r. reflexivity.
+  - simpl. rewrite -> mult_n_Sk.
+    rewrite -> IHn'.
+    rewrite -> plus_comm.
+    reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (more_exercises) 
