@@ -844,16 +844,70 @@ Definition manual_grade_for_binary_inverse_b : option (nat*string) := None.
         if you can find a lemma -- perhaps requiring its own inductive
         proof -- that will allow the main proof to make progress.) Don't
         define this using [nat_to_bin] and [bin_to_nat]! *)
+Fixpoint double_bin (b: bin): bin :=
+  match b with
+  | Z => Z
+  | _ => B0 b
+  end.
 
 Fixpoint normalize (b : bin) : bin :=
   match b with
   | Z => Z
-  | B0 rest => match (normalize rest) with
-               | Z => Z
-               | b' => B0 b'
-              end
+  | B0 rest => double_bin (normalize rest)
   | B1 rest => B1 (normalize rest)
   end.
+
+Lemma double_incr : forall b,
+  double_bin (incr b) = incr (incr (double_bin b)).
+Proof.
+  intros b.
+  destruct b.
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+Qed.
+
+Lemma incr_double: forall b: bin,
+  incr (double_bin b) = B1 b.
+Proof.
+  intros b.
+  induction b as [| b0 IHb0| b1 IHb1].
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+Qed.
+
+Lemma nat_double_bin: forall n: nat,
+  nat_to_bin (double n) = double_bin (nat_to_bin n).
+Proof.
+  intros n.
+  induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - simpl.
+    rewrite -> IHn'.
+    rewrite -> double_incr.
+    reflexivity.
+Qed.
+
+Theorem bin_nat_bin: forall b : bin,
+  nat_to_bin (bin_to_nat b) = normalize b.
+Proof.
+  induction b as [| b0 IHb0| b1 IHb1].
+  - simpl. reflexivity.
+  - simpl.
+    rewrite <- plus_n_O.
+    rewrite <- double_plus.
+    rewrite -> nat_double_bin.
+    rewrite -> IHb0.
+    reflexivity.
+  - simpl.
+    rewrite <- plus_n_O.
+    rewrite <- double_plus.
+    rewrite -> nat_double_bin.
+    rewrite -> IHb1.
+    rewrite -> incr_double.
+    reflexivity.
+Qed.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_binary_inverse_c : option (nat*string) := None.
