@@ -823,7 +823,12 @@ Definition manual_grade_for_binary_inverse_a : option (nat*string) := None.
         the same number we started with.  However, this is not the
         case!  Explain (in a comment) what the problem is. *)
 
-(* FILL IN HERE *)
+(*
+  consider 1 it has infinite binary representations
+  for example (B1 Z) and (B1 (B0 Z)) and (B1 (B0 (B0 Z))) and (B1 (B0 (B0 (B0 Z)))) and ...
+  so if we converting a bin to nat and then convert it back to bin we may not get back
+  the original input
+*)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_binary_inverse_b : option (nat*string) := None.
