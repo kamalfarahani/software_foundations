@@ -713,7 +713,40 @@ Proof.
     want to change your original definitions to make the property
     easier to prove, feel free to do so! *)
 
-(* FILL IN HERE *)
+Inductive bin : Type :=
+  | Z
+  | B0 (n : bin)
+  | B1 (n : bin).
+
+Fixpoint incr (m:bin) : bin :=
+  match m with
+  | Z => B1 Z
+  | B0 rest => B1 rest
+  | B1 rest => B0 (incr rest)
+  end.
+
+Fixpoint bin_to_nat (m:bin) : nat :=
+  match m with
+  | Z => O
+  | B0 rest => 2 * (bin_to_nat rest)
+  | B1 rest => S (2 * (bin_to_nat (rest)))
+  end.
+
+Theorem binary_commute : forall m:bin,
+  (S (bin_to_nat m)) = (bin_to_nat (incr m)).
+Proof.
+  intros m.
+  induction m as [| b0 IHb0| b1 IHb1].
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+  - simpl.
+    rewrite <- plus_n_O.
+    rewrite <- plus_n_O.
+    rewrite <- IHb1.
+    simpl.
+    rewrite -> plus_n_Sm.
+    reflexivity.
+Qed.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_binary_commute : option (nat*string) := None.
