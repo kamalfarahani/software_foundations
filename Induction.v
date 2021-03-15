@@ -763,7 +763,7 @@ Definition manual_grade_for_binary_commute : option (nat*string) := None.
 
 Fixpoint nat_to_bin (n:nat) : bin :=
   match n with
-  | O => B0 Z
+  | O => Z
   | S n' => incr (nat_to_bin n')
   end.
 
@@ -845,7 +845,15 @@ Definition manual_grade_for_binary_inverse_b : option (nat*string) := None.
         proof -- that will allow the main proof to make progress.) Don't
         define this using [nat_to_bin] and [bin_to_nat]! *)
 
-(* FILL IN HERE *)
+Fixpoint normalize (b : bin) : bin :=
+  match b with
+  | Z => Z
+  | B0 rest => match (normalize rest) with
+               | Z => Z
+               | b' => B0 b'
+              end
+  | B1 rest => B1 (normalize rest)
+  end.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_binary_inverse_c : option (nat*string) := None.
