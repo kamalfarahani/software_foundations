@@ -316,18 +316,24 @@ Fixpoint oddmembers (l:natlist) : natlist :=
 
 Example test_oddmembers:
   oddmembers [0;1;0;2;3;0;0] = [1;3].
-Proof. simpl. reflexivity.
+Proof.
+  simpl. reflexivity.
+Qed.
 
-Definition countoddmembers (l:natlist) : nat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition countoddmembers (l:natlist) : nat := 
+  length (oddmembers l).
 
 Example test_countoddmembers1:
   countoddmembers [1;0;3;1;4;5] = 4.
-  (* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
 
 Example test_countoddmembers2:
   countoddmembers [0;2;4] = 0.
-  (* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
 
 Example test_countoddmembers3:
   countoddmembers nil = 0.
