@@ -291,19 +291,32 @@ Proof. reflexivity. Qed.
     [countoddmembers] below. Have a look at the tests to understand
     what these functions should do. *)
 
-Fixpoint nonzeros (l:natlist) : natlist
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint nonzeros (l:natlist) : natlist :=
+  match l with
+  | nil => nil
+  | h :: t => match h with
+              | O => nonzeros t
+              | _ => h :: nonzeros t
+              end
+  end.
 
 Example test_nonzeros:
   nonzeros [0;1;0;2;3;0;0] = [1;2;3].
-  (* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
 
-Fixpoint oddmembers (l:natlist) : natlist
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint oddmembers (l:natlist) : natlist :=
+  match l with
+  | nil => nil
+  | h :: t => if oddb h 
+              then h :: oddmembers t 
+              else oddmembers t
+  end.
 
 Example test_oddmembers:
   oddmembers [0;1;0;2;3;0;0] = [1;3].
-  (* FILL IN HERE *) Admitted.
+Proof. simpl. reflexivity.
 
 Definition countoddmembers (l:natlist) : nat
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
