@@ -501,13 +501,18 @@ Proof. simpl. reflexivity. Qed.
 Example test_remove_all4:  count 5 (remove_all 5 [2;1;5;4;5;1;4;5;1;4]) = 0.
 Proof. simpl. reflexivity. Qed.
 
-Fixpoint subset (s1 : bag) (s2 : bag) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint subset (s1 : bag) (s2 : bag) : bool :=
+  match s1, s2 with
+  | nil, nil => true
+  | nil, _ => true
+  | _ , nil => false
+  | h :: t, _ => negb (count h s2 =? 0) && subset t (remove_one h s2)
+  end.
 
 Example test_subset1:              subset [1;2] [2;1;4;1] = true.
- (* FILL IN HERE *) Admitted.
+Proof. simpl. reflexivity. Qed.
 Example test_subset2:              subset [1;2;2] [2;1;4;1] = false.
- (* FILL IN HERE *) Admitted.
+Proof. simpl.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, especially useful (add_inc_count) 
