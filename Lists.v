@@ -512,19 +512,25 @@ Fixpoint subset (s1 : bag) (s2 : bag) : bool :=
 Example test_subset1:              subset [1;2] [2;1;4;1] = true.
 Proof. simpl. reflexivity. Qed.
 Example test_subset2:              subset [1;2;2] [2;1;4;1] = false.
-Proof. simpl.
+Proof. simpl. reflexivity. Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, especially useful (add_inc_count) 
 
     Adding a value to a bag should increase the value's count by one.
     State that as a theorem and prove it. *)
-(*
-Theorem bag_theorem : ...
+
+Theorem bag_theorem : forall n:nat, forall b:bag,
+  length (add n b) = (length b) + 1.
 Proof.
-  ...
+  intros n b.
+  destruct b as [| m b'].
+  - simpl. reflexivity.
+  - simpl.
+    rewrite <- plus_comm.
+    simpl.
+    reflexivity.
 Qed.
-*)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_add_inc_count : option (nat*string) := None.
