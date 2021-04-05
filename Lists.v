@@ -872,7 +872,11 @@ Search (?x + ?y = ?y + ?x).
 Theorem app_nil_r : forall l : natlist,
   l ++ [] = l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros l.
+  induction l as [| n l' IHl'].
+  - simpl. reflexivity.
+  - simpl. rewrite -> IHl'. reflexivity.
+Qed.
 
 Theorem rev_app_distr: forall l1 l2 : natlist,
   rev (l1 ++ l2) = rev l2 ++ rev l1.
