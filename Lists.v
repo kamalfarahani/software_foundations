@@ -890,10 +890,26 @@ Proof.
     reflexivity.
 Qed.
 
+Lemma rev_app: forall l: natlist, forall n: nat,
+  rev (l ++ [n]) = n :: rev l.
+Proof.
+  intros l n.
+  induction l as [| m l' IHl'].
+  - simpl. reflexivity.
+  - simpl. rewrite -> IHl'.
+    simpl. reflexivity.
+Qed.
+
 Theorem rev_involutive : forall l : natlist,
   rev (rev l) = l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros l.
+  induction l as [| n l' IHl'].
+  - simpl. reflexivity.
+  - simpl. rewrite -> rev_app.
+    rewrite -> IHl'.
+    reflexivity.
+Qed.
 
 (** There is a short solution to the next one.  If you find yourself
     getting tangled up, step back and try to look for a simpler
