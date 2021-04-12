@@ -1200,9 +1200,14 @@ Definition eqb_id (x1 x2 : id) :=
   end.
 
 (** **** Exercise: 1 star, standard (eqb_id_refl)  *)
-Theorem eqb_id_refl : forall x, true = eqb_id x x.
+Theorem eqb_id_refl : forall x:id, true = eqb_id x x.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros x.
+  destruct x as [n].
+  simpl.
+  rewrite -> NatList.eqbnat_refl.
+  reflexivity.
+Qed.
 (** [] *)
 
 (** Now we define the type of partial maps: *)
