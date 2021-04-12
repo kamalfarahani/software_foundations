@@ -965,10 +965,25 @@ Example test_eqblist3 :
   eqblist [1;2;3] [1;2;4] = false.
 Proof. simpl. reflexivity. Qed.
 
+Lemma eqbnat_refl: forall n: nat,
+  (n =? n) = true.
+Proof.
+  induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - simpl. rewrite -> IHn'. reflexivity.
+Qed.
+
 Theorem eqblist_refl : forall l:natlist,
   true = eqblist l l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros l.
+  induction l as [| n l' IHl'].
+  - simpl. reflexivity.
+  - simpl.
+    rewrite -> eqbnat_refl.
+    rewrite -> IHl'.
+    reflexivity.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
