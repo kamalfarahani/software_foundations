@@ -615,7 +615,9 @@ Proof.
   simpl. reflexivity.
 Qed.
 Example test_hd_error2 : hd_error  [[1];[2]]  = Some [1].
- (* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -732,16 +734,20 @@ Proof. reflexivity. Qed.
     and returns a list of just those that are even and greater than
     7. *)
 
-Definition filter_even_gt7 (l : list nat) : list nat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition filter_even_gt7 (l : list nat) : list nat :=
+  filter (fun x => (evenb x) && (7 <? x)) l.
 
 Example test_filter_even_gt7_1 :
   filter_even_gt7 [1;2;6;9;10;3;12;8] = [10;12;8].
- (* FILL IN HERE *) Admitted.
+Proof.
+  reflexivity.
+Qed.
 
 Example test_filter_even_gt7_2 :
   filter_even_gt7 [5;2;6;19;129] = [].
- (* FILL IN HERE *) Admitted.
+Proof.
+  reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (partition) 
@@ -761,13 +767,17 @@ Example test_filter_even_gt7_2 :
 Definition partition {X : Type}
                      (test : X -> bool)
                      (l : list X)
-                   : list X * list X
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+                   : list X * list X :=
+  ((filter test l), (filter (fun x => negb (test x)) l)).
 
 Example test_partition1: partition oddb [1;2;3;4;5] = ([1;3;5], [2;4]).
-(* FILL IN HERE *) Admitted.
+Proof.
+  reflexivity.
+Qed.
 Example test_partition2: partition (fun x => false) [5;9;0] = ([], [5;9;0]).
-(* FILL IN HERE *) Admitted.
+Proof.
+  reflexivity.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
