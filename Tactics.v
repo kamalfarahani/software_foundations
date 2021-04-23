@@ -113,7 +113,14 @@ Theorem rev_exercise1 : forall (l l' : list nat),
      l = rev l' ->
      l' = rev l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros l l' eq1.
+  assert (rev l = rev (rev l')) as eq2.
+  { rewrite -> eq1. reflexivity. }
+  assert (rev l = l') as eq3.
+  { rewrite <- rev_involutive. apply eq2.  }
+  symmetry.
+  apply eq3.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (apply_rewrite) 
