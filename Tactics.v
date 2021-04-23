@@ -202,7 +202,15 @@ Example trans_eq_exercise : forall (n m o p : nat),
      (n + p) = m ->
      (n + p) = (minustwo o).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m o p eq1 eq2.
+  assert ((minustwo o) = m) as eq3.
+  { symmetry. apply eq1. }
+  assert (m = n + p) as eq4.
+  { symmetry. apply eq2. }
+  transitivity m.
+  apply eq2.
+  apply eq1.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
