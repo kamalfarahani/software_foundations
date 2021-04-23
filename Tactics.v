@@ -75,7 +75,9 @@ Theorem silly_ex :
      evenb 2 = true ->
      oddb 3 = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros eq1 eq2.
+  apply eq1. apply eq2.
+Qed.
 (** [] *)
 
 (** To use the [apply] tactic, the (conclusion of the) fact
