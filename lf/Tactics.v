@@ -1185,7 +1185,15 @@ Theorem eqb_trans : forall n m p,
   m =? p = true ->
   n =? p = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m p H1 H2.
+  apply eqb_true in H1.
+  apply eqb_true in H2.
+  assert (n = p) as semi_goal.
+  { transitivity m. apply H1. apply H2. }
+  rewrite -> semi_goal.
+  rewrite <- eqb_refl.
+  reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced (split_combine) 
