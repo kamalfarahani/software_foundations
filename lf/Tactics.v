@@ -973,7 +973,19 @@ Theorem combine_split : forall X Y (l : list (X * Y)) l1 l2,
   split l = (l1, l2) ->
   combine l1 l2 = l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X Y l.
+  induction l as [| n l' IHl'].
+  - simpl. intros l1 l2 H. injection H as H1 H2.
+    rewrite <- H1. rewrite <- H2. reflexivity.
+  - intros l1 l2.
+    destruct n as [x y] eqn:E1.
+    + simpl. destruct (split l') as [l1' l2'] eqn:E2.
+      ++ simpl. intros H. injection H as H1 H2.
+         rewrite <- H1. rewrite <- H2.
+         simpl. f_equal.
+         apply IHl'. f_equal.
+Qed.
+
 (** [] *)
 
 (** The [eqn:] part of the [destruct] tactic is optional: So far,
