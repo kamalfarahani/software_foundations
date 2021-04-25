@@ -148,7 +148,14 @@ Qed.
 Example and_exercise :
   forall n m : nat, n + m = 0 -> n = 0 /\ m = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m H. split.
+  destruct n as [| n'] eqn:E.
+  - reflexivity.
+  - discriminate H.
+  - destruct m as [| m'].
+    + reflexivity.
+    + rewrite plus_comm in H. discriminate H.
+Qed.
 (** [] *)
 
 (** So much for proving conjunctive statements.  To go in the other
