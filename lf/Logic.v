@@ -956,15 +956,31 @@ Qed.
     lemma below.  (Of course, your definition should _not_ just
     restate the left-hand side of [All_In].) *)
 
-Fixpoint All {T : Type} (P : T -> Prop) (l : list T) : Prop
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition All {T : Type} (P : T -> Prop) (l : list T) : Prop :=
+  fold and (map P l) True.
 
 Theorem All_In :
   forall T (P : T -> Prop) (l : list T),
     (forall x, In x l -> P x) <->
     All P l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros T P l. unfold All. split.
+  - intros H. induction l as [| n l' IHl'].
+    + simpl. simpl in H. trivial.
+    + simpl. simpl in H. split.
+      * apply H. left. reflexivity.
+      * apply IHl'. intros x H'.
+        apply H. right. apply H'.
+  - intros H. induction l as [| n l' IHl'].
+    + simpl. intros x H'. destruct H'.
+    + simpl. simpl in H.
+      intros x H'.
+      destruct H as [H1 H2].
+      destruct H' as [H1' | H2'].
+      * rewrite <- H1'. apply H1.
+      * apply IHl' with (x := x) in H2.
+        apply H2. apply H2'.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (combine_odd_even) 
