@@ -606,10 +606,29 @@ Proof.
   - intros HP. apply HP.
 Qed.
 
+Theorem if_trans: forall P Q R : Prop,
+  ((P -> Q) /\  (Q -> R)) -> (P -> R).
+Proof.
+  intros P Q R H.
+  destruct H as [H1 H2].
+  intros HP. apply H1 in HP. apply H2 in HP. apply HP.
+Qed.
+
 Theorem iff_trans : forall P Q R : Prop,
   (P <-> Q) -> (Q <-> R) -> (P <-> R).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q R.
+  intros HPQ HQP.
+  destruct HPQ as [H1 H2].
+  destruct HQP as [H1' H2'].
+  split.
+  - apply if_trans with (Q := Q). split.
+    + apply H1.
+    + apply H1'.
+  - apply if_trans with (Q := Q). split.
+    + apply H2'.
+    + apply H2.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (or_distributes_over_and)  *)
