@@ -874,13 +874,51 @@ Qed.
     of strengths and limitations. *)
 
 (** **** Exercise: 3 stars, standard (In_map_iff)  *)
+Theorem and_distributes_over_or: forall P Q R: Prop,
+  P /\ (Q \/ R) <-> (P /\ Q) \/ (P /\ R).
+Proof.
+  intros P Q R. split.
+  - intros H. destruct H as [HP [HQ | HR]].
+    + left. split. apply HP. apply HQ.
+    + right. split. apply HP. apply HR.
+  - intros H. destruct H as [[HP HQ] | [HP HR]].
+    + split. apply HP. left. apply HQ.
+    + split. apply HP. right. apply HR.
+Qed.
+
 Theorem In_map_iff :
   forall (A B : Type) (f : A -> B) (l : list A) (y : B),
     In y (map f l) <->
     exists x, f x = y /\ In x l.
 Proof.
   intros A B f l y. split.
-  (* FILL IN HERE *) Admitted.
+  - intros H. induction l as [| n l' IHl'].
+    + simpl in H. destruct H.
+    + simpl in H. destruct H as [H' | H'].
+      ++ exists n. split.
+        +++ apply H'.
+        +++ simpl. left. reflexivity.
+      ++ simpl. apply IHl' in H'.
+         destruct H' as [x E].
+         exists x.
+         rewrite -> and_distributes_over_or.
+         right. apply E.
+  - intros H. induction l as [| n l' IHl'].
+    + simpl.
+      destruct H as [x E].
+      simpl in E. destruct E as [_ H'].
+      apply H'.
+    + simpl. simpl in H.
+      destruct H as [x E].
+      rewrite and_distributes_over_or in E.
+      destruct E as [[E1 E2] | E].
+      ++ rewrite <- E2 in E1.
+         left. apply E1.
+      ++ assert (exists x', f x' = y /\ In x' l') as E'.
+         { exists x. apply E. }
+         apply IHl' in E'.
+         right. apply E'.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (In_app_iff)  *)
