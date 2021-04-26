@@ -925,8 +925,23 @@ Qed.
 Theorem In_app_iff : forall A l l' (a:A),
   In a (l++l') <-> In a l \/ In a l'.
 Proof.
-  intros A l. induction l as [|a' l' IH].
-  (* FILL IN HERE *) Admitted.
+  intros A l. induction l as [|a' l'' IH].
+  - intros l' a. simpl. split.
+    + intros H. right. apply H.
+    + intros H. destruct H as [contra | H'].
+      ++ destruct contra.
+      ++ apply H'.
+  - intros l' a. simpl. split.
+    + intros H. rewrite <- or_assoc.
+      destruct H as [H1 | H2].
+      ++ left. apply H1.
+      ++ right. apply IH in H2. apply H2.
+    + intros H.
+      rewrite <- or_assoc in H.
+      destruct H as [H1 | H2].
+      ++ left. apply H1.
+      ++ right. apply IH in H2. apply H2.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, especially useful (All) 
