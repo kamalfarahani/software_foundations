@@ -1361,6 +1361,7 @@ Proof.
   rewrite -> rev_append_correct.
   rewrite -> app_nil_r.
   reflexivity.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
