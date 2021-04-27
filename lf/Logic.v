@@ -1615,7 +1615,18 @@ Qed.
 Theorem eqb_neq : forall x y : nat,
   x =? y = false <-> x <> y.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros x y. split.
+  - intros H1. intros H2.
+    rewrite <- eqb_eq in H2.
+    rewrite -> H1 in H2.
+    discriminate H2.
+  - intros H.
+    rewrite <- not_true_iff_false.
+    unfold not.
+    unfold not in H.
+    rewrite <- eqb_eq in H.
+    apply H.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (eqb_list) 
