@@ -1578,7 +1578,16 @@ Qed.
 Theorem andb_true_iff : forall b1 b2:bool,
   b1 && b2 = true <-> b1 = true /\ b2 = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b1 b2. split.
+  - intros H.
+    destruct b1,b2.
+    + split. reflexivity. reflexivity.
+    + simpl in H. discriminate H.
+    + simpl in H. discriminate H.
+    + simpl in H. discriminate H.
+  - intros H. destruct H as [H1 H2].
+    + rewrite H1. rewrite H2. reflexivity.
+Qed.
 
 Theorem orb_true_iff : forall b1 b2,
   b1 || b2 = true <-> b1 = true \/ b2 = true.
