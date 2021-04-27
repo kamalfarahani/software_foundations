@@ -1592,7 +1592,18 @@ Qed.
 Theorem orb_true_iff : forall b1 b2,
   b1 || b2 = true <-> b1 = true \/ b2 = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b1 b2. split.
+  - intros H. destruct b1, b2.
+    + left. reflexivity.
+    + left. reflexivity.
+    + right. reflexivity.
+    + simpl in H. discriminate H.
+  - intros H. destruct H as [H1 | H2].
+    + rewrite H1. reflexivity.
+    + rewrite H2. destruct b1.
+      * reflexivity.
+      * reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard (eqb_neq) 
