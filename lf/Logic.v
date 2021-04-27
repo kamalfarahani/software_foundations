@@ -1398,8 +1398,23 @@ Qed.
 Lemma evenb_double_conv : forall n, exists k,
   n = if evenb n then double k else S (double k).
 Proof.
-  (* Hint: Use the [evenb_S] lemma from [Induction.v]. *)
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  induction n as [| n' IHn'].
+  - exists 0. simpl. reflexivity.
+  - destruct (evenb n') eqn:E.
+    + destruct IHn' as [k E'].
+      exists k.
+      rewrite -> E'.
+      rewrite -> evenb_S.
+      rewrite -> evenb_double.
+      simpl. reflexivity.
+    + destruct IHn' as [k E'].
+      exists (S k).
+      rewrite -> E'.
+      simpl.
+      rewrite -> evenb_double.
+      reflexivity.
+Qed.
 (** [] *)
 
 (** Now the main theorem: *)
