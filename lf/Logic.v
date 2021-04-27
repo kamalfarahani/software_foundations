@@ -1339,10 +1339,28 @@ Definition tr_rev {X} (l : list X) : list X :=
     code in this case.
 
     Prove that the two definitions are indeed equivalent. *)
+Lemma rev_append_correct: forall (X : Type) (l1 l2 : list X),
+  rev_append l1 l2 = rev l1 ++ l2.
+Proof.
+  intros X l1.
+  induction l1 as [| x l1' IHl1].
+  - simpl. reflexivity.
+  - intros l2. simpl.
+    rewrite <- app_assoc.
+    simpl.
+    rewrite -> (IHl1 (x :: l2)).
+    reflexivity.
+Qed.
 
 Theorem tr_rev_correct : forall X, @tr_rev X = @rev X.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros X.
+  unfold tr_rev.
+  apply functional_extensionality.
+  intros x.
+  rewrite -> rev_append_correct.
+  rewrite -> app_nil_r.
+  reflexivity.
 (** [] *)
 
 (* ================================================================= *)
