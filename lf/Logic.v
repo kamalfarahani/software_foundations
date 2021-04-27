@@ -1638,16 +1638,59 @@ Qed.
     definition is correct, prove the lemma [eqb_list_true_iff]. *)
 
 Fixpoint eqb_list {A : Type} (eqb : A -> A -> bool)
-                  (l1 l2 : list A) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+                  (l1 l2 : list A) : bool :=
+  match l1, l2 with
+  | [], [] => true
+  | [], _ => false
+  | _, [] => false
+  |h :: t, h' :: t' => if eqb h h'
+                       then eqb_list eqb t t'
+                       else false
+  end.
 
 Theorem eqb_list_true_iff :
   forall A (eqb : A -> A -> bool),
     (forall a1 a2, eqb a1 a2 = true <-> a1 = a2) ->
     forall l1 l2, eqb_list eqb l1 l2 = true <-> l1 = l2.
 Proof.
-(* FILL IN HERE *) Admitted.
-
+  intros A eqb H.
+  intros l1 l2. split.
+  - generalize dependent l2.
+    induction l1 as [| n l1' IHl1'].
+    -- simpl. destruct l2 as [| n' l2'].
+      + intros H'. reflexivity.
+      + intros H'. discriminate H'.
+    -- simpl. destruct l2 as [| n' l2'].
+      + intros H'. discriminate H'.
+      + destruct (eqb n n') eqn:E.
+        * intros H''.
+          apply H in E.
+          rewrite -> E.
+          f_equal.
+          apply IHl1' in H''.
+          apply H''.
+        * intros H''. discriminate H''.
+  - generalize dependent l2.
+    induction l1 as [| n l1' IHl1'].
+    -- simpl. destruct l2 as [| n' l2'].
+      + intros H'. reflexivity.
+      + intros H'. discriminate H'.
+    -- simpl. destruct l2 as [| n' l2'].
+      + intros H'. discriminate H'.
+      + destruct (eqb n n') eqn:E.
+        * intros H''.
+          apply H in E.
+          rewrite -> E in H''.
+          injection H'' as H'''.
+          apply IHl1' in H'''.
+          apply H'''.
+        * intros H''.
+          exfalso.
+          injection H'' as H1 H2.
+          apply H in H1.
+          rewrite -> E in H1.
+          discriminate H1.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, especially useful (All_forallb) 
