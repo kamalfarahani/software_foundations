@@ -1897,7 +1897,17 @@ Theorem not_exists_dist :
   forall (X:Type) (P : X -> Prop),
     ~ (exists x, ~ P x) -> (forall x, P x).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold excluded_middle. unfold not. intros exmid.
+  intros X P H x.
+  assert (P x \/ (P x -> False)) as H'.
+  { apply exmid. }
+  destruct H' as [H1 | H2].
+  - apply H1.
+  - exfalso.
+    apply H.
+    exists x.
+    apply H2.
+Qed.
 (** [] *)
 
 (** **** Exercise: 5 stars, standard, optional (classical_axioms) 
