@@ -1710,7 +1710,24 @@ Fixpoint forallb {X : Type} (test : X -> bool) (l : list X) : bool :=
 Theorem forallb_true_iff : forall X test (l : list X),
    forallb test l = true <-> All (fun x => test x = true) l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X test l. unfold All. split.
+  - induction l as [| n l' IHl'].
+    + simpl. intros H. trivial.
+    + simpl.
+      destruct (test n) eqn:E.
+      * simpl. intros H. simpl.
+        apply IHl' in H. split.
+        ** reflexivity.
+        ** apply H.
+      * simpl. intros H. discriminate H.
+  - induction l as [| n l' IHl'].
+    + simpl. intros H. reflexivity.
+    + simpl. destruct (test n) eqn:E.
+      * simpl. intros H. destruct H as [H1 H2].
+        apply IHl' in H2. apply H2.
+      * simpl. intros H. destruct H as [H1 H2].
+        discriminate H1.
+Qed.
 
 (** (Ungraded thought question) Are there any important properties of
     the function [forallb] which are not captured by this
