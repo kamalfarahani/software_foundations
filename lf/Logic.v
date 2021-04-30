@@ -1938,8 +1938,112 @@ Definition de_morgan_not_and_not := forall P Q:Prop,
 Definition implies_to_or := forall P Q:Prop,
   (P->Q) -> (~P\/Q).
 
-(* FILL IN HERE
+Theorem peirce_to_double_negation_elimination:
+  peirce -> double_negation_elimination.
+Proof.
+  unfold peirce.
+  unfold double_negation_elimination.
+  unfold not.
+  intros pe.
+  intros P.
+  intros H'.
+  apply (pe P False).
+  intros H.
+  apply H' in H.
+  destruct H.
+Qed.
 
-    [] *)
+Theorem double_negation_elimination_to_de_morgan_not_and_not:
+  double_negation_elimination -> de_morgan_not_and_not.
+Proof.
+  unfold double_negation_elimination.
+  unfold de_morgan_not_and_not.
+  unfold not.
+  intros DNE.
+  intros P Q H.
+  apply DNE.
+  intros H'.
+  apply H.
+  split.
+    - intros H''.
+      apply H'.
+      left. apply H''.
+    - intros H''.
+      apply H'.
+      right. apply H''.
+Qed.
+
+Theorem de_morgan_not_and_not_to_implies_to_or:
+  de_morgan_not_and_not -> implies_to_or.
+Proof.
+  unfold de_morgan_not_and_not.
+  unfold implies_to_or.
+  unfold not.
+  intros DMN.
+  intros P Q H.
+  apply DMN.
+  intros H'.
+  destruct H' as [H1 H2].
+  apply H2.
+  apply H.
+  exfalso.
+  apply H1.
+  intros HP.
+  apply H in HP.
+  apply H2 in HP.
+  apply HP.
+Qed.
+
+Theorem implies_to_or_to_peirce: 
+  implies_to_or -> peirce.
+Proof.
+  unfold implies_to_or.
+  unfold peirce.
+  unfold not.
+  intros ITO.
+  intros P Q.
+  intros H.
+  assert (Q -> Q) as HQQ.
+  { intros HQ. apply HQ. }
+  assert (P -> P) as HPP.
+  { intros HP. apply HP. }
+  apply ITO in HPP.
+  apply ITO in HQQ.
+  destruct HPP as [H1P | H2P].
+  - destruct HQQ as [H1Q | H2Q].
+    + assert (P -> Q) as HPQ.
+      { intros HP. apply H1P in HP. destruct HP. }
+      apply H in HPQ. apply HPQ.
+    + assert (P -> Q) as HPQ.
+      { intros HP. apply H1P in HP. destruct HP. }
+      apply H in HPQ. apply HPQ.
+  - apply H2P.
+Qed.
+
+Theorem implies_to_or_is_excluded_middle:
+  implies_to_or <-> excluded_middle.
+Proof.
+  unfold implies_to_or.
+  unfold excluded_middle.
+  unfold not.
+  split.
+  - intros ITO P.
+    assert (P -> P) as H.
+    { intros HP. apply HP. }
+    apply (ITO P P) in H.
+    destruct H as [H1 | H2].
+    + right. apply H1.
+    + left. apply H2.
+  - intros EM P Q H.
+    assert (P \/  (P -> False)) as HP.
+    { apply EM. }
+    assert (Q \/ (Q -> False)) as HQ.
+    { apply EM. }
+    destruct HP as [H1P | H2P].
+    + destruct HQ as [H1Q | H2Q].
+      * right. apply H1Q.
+      * apply H in H1P. right. apply H1P.
+    + left. apply H2P.
+Qed.
 
 (* 2020-09-09 20:51 *)
