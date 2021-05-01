@@ -529,7 +529,17 @@ Inductive ev' : nat -> Prop :=
 
 Theorem ev'_ev : forall n, ev' n <-> ev n.
 Proof.
- (* FILL IN HERE *) Admitted.
+  intros n. split.
+  - intros E.
+    induction E as [ | | n1 n2 E1 IH1 E3 IH2].
+      + apply ev_0.
+      + apply ev_SS. apply ev_0.
+      + apply ev_sum. apply IH1. apply IH2.
+  - intros E.
+    induction E as [| n' E' IHE].
+    + apply ev'_0.
+    + apply (ev'_sum 2 n' ev'_2 IHE).
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced, especially useful (ev_ev__ev) 
