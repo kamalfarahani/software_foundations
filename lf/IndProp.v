@@ -327,7 +327,11 @@ Theorem one_not_even' : ~ ev 1.
 Theorem SSSSev__even : forall n,
   ev (S (S (S (S n)))) -> ev n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n E.
+  inversion E as [| n' E'].
+  inversion E' as [| n'' E'' Heq].
+  apply E''.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard (ev5_nonsense) 
@@ -337,7 +341,11 @@ Proof.
 Theorem ev5_nonsense :
   ev 5 -> 2 + 2 = 9.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros E.
+  inversion E as [| n' E'].
+  inversion E' as [| n'' E''].
+  inversion E''.
+Qed.
 (** [] *)
 
 (** The [inversion] tactic does quite a bit of work. For
