@@ -504,7 +504,11 @@ Qed.
 (** **** Exercise: 2 stars, standard (ev_sum)  *)
 Theorem ev_sum : forall n m, ev n -> ev m -> ev (n + m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m E1 E2.
+  induction E1 as [| n' E1' IH].
+  - simpl. apply E2.
+  - simpl. apply ev_SS. apply IH.
+Qed.
 (** [] *)
 
 (** **** Exercise: 4 stars, advanced, optional (ev'_ev) 
