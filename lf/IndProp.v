@@ -547,10 +547,26 @@ Qed.
     There are two pieces of evidence you could attempt to induct upon
     here. If one doesn't work, try the other. *)
 
+Lemma ev_SS_sum: forall n: nat,
+  ev (S (S n)) -> ev n.
+Proof.
+  intros n E.
+  inversion E as [| n' E' EQ].
+  apply E'.
+Qed.
+
 Theorem ev_ev__ev : forall n m,
   ev (n+m) -> ev n -> ev m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m.
+  intros E1 E2.
+  induction E2 as [| n' E2' IH].
+  - simpl in E1. apply E1.
+  - simpl in E1.
+    apply ev_SS_sum in E1.
+    apply IH in E1.
+    apply E1.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (ev_plus_plus) 
