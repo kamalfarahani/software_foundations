@@ -578,7 +578,17 @@ Qed.
 Theorem ev_plus_plus : forall n m p,
   ev (n+m) -> ev (n+p) -> ev (m+p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m p E.
+  apply ev_ev__ev.
+  rewrite plus_comm.
+  rewrite plus_swap.
+  rewrite <- plus_assoc.
+  rewrite plus_assoc.
+  apply ev_sum.
+  apply E.
+  rewrite <- double_plus.
+  apply ev_double.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
