@@ -686,9 +686,8 @@ Inductive total_relation : nat -> nat -> Prop :=
     Define an inductive binary relation [empty_relation] (on numbers)
     that never holds. *)
 
-(* FILL IN HERE
-
-    [] *)
+Inductive empty_relation : nat -> nat -> Prop :=
+  | never (n m : nat) (H: empty_relation n m) : empty_relation n m.
 
 (** From the definition of [le], we can sketch the behaviors of
     [destruct], [inversion], and [induction] on a hypothesis [H]
