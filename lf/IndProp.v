@@ -918,7 +918,17 @@ Inductive R : nat -> nat -> nat -> Prop :=
       would the set of provable propositions change?  Briefly (1
       sentence) explain your answer. *)
 
-(* FILL IN HERE *)
+(* 
+  - [R 1 1 2] can be obtained through following sequence:
+    [R 0 0 0] -- c2 --> [R 1 0 1] -- c3 --> [R 1 1 2].
+    but we can't derive [R 2 2 6] from given constructors.
+
+  - No because c4 is symmetric for m n and we can do what ever we did 
+    with c2 constructor on m with c3 constructor on n as well.
+
+  - No we start with [R 0 0 0] suppose we derived some [R (S m) (S n) (S (S o))]
+    by using c2 and c3 we could derive [R m n o] by removing one use of c2 and one use of 3.
+*)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_R_provability : option (nat*string) := None.
