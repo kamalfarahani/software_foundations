@@ -707,35 +707,95 @@ Inductive empty_relation : nat -> nat -> Prop :=
     we are going to need later in the course.  The proofs make good
     practice exercises. *)
 
+Lemma Sn_le_m: forall n m: nat,
+  S n <= m -> n <= m.
+Proof.
+  intros n m H.
+  induction H as [| m' H' IH].
+  - apply le_S. apply le_n.
+  - apply le_S. apply IH.
+Qed.
+
 Lemma le_trans : forall m n o, m <= n -> n <= o -> m <= o.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros m n o H1.
+  induction H1 as [| n' H IH].
+  - trivial.
+  - intros H2.
+    apply Sn_le_m in H2.
+    apply IH in H2.
+    apply H2.
+Qed.
 
 Theorem O_le_n : forall n,
   0 <= n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  induction n as [| n' IHn'].
+  - apply (le_n 0).
+  - apply le_S. apply IHn'.
+Qed.
 
 Theorem n_le_m__Sn_le_Sm : forall n m,
   n <= m -> S n <= S m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m H.
+  induction H as [| m' H' IH].
+  - trivial.
+  - apply le_S. apply IH.
+Qed.
 
 Theorem Sn_le_Sm__n_le_m : forall n m,
   S n <= S m -> n <= m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m H.
+  inversion H as [| m' H' EQ].
+  - trivial.
+  - apply Sn_le_m in H'.
+    apply H'.
+Qed.
 
 Theorem le_plus_l : forall a b,
   a <= a + b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros a b.
+  induction a as [| a' IHa'].
+  - simpl.
+    induction b as [| b' IHb'].
+    + trivial.
+    + apply le_S. apply IHb'.
+  - simpl.
+    apply n_le_m__Sn_le_Sm.
+    apply IHa'.
+Qed.
 
 Theorem plus_le : forall n1 n2 m,
   n1 + n2 <= m ->
   n1 <= m /\ n2 <= m.
 Proof.
- (* FILL IN HERE *) Admitted.
+  intros n1 n2 m H.
+  induction H as [| m' H' IH].
+  - split.
+    apply le_plus_l.
+    rewrite plus_comm.
+    apply le_plus_l.
+  - destruct IH as [H1 H2].
+    split.
+    apply le_S. apply H1.
+    apply le_S. apply H2.
+Qed.
+
+Lemma n_le_m_to_Sn_le_m: forall n m x: nat, 
+  n + S x <= m -> S n <= m.
+Proof.
+  intros n m x H.
+  induction H as [| m' H' IH].
+  - rewrite <- plus_n_Sm.
+    apply n_le_m__Sn_le_Sm.
+    apply le_plus_l.
+  - apply le_S in IH.
+    apply IH.
+Qed.
 
 (** Hint: the next one may be easiest to prove by induction on [n]. *)
 
@@ -748,18 +808,41 @@ Theorem lt_S : forall n m,
   n < m ->
   n < S m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m.
+  unfold lt.
+  intros H.
+  apply n_le_m__Sn_le_Sm.
+  apply Sn_le_m in H.
+  apply H.
+Qed.
 
 Theorem plus_lt : forall n1 n2 m,
   n1 + n2 < m ->
   n1 < m /\ n2 < m.
 Proof.
-(* FILL IN HERE *) Admitted.
+  unfold lt. intros n1 n2 m H. split.
+  - apply le_trans with (n:= S n1 + n2).
+    + apply le_plus_l.
+    + simpl. apply H.
+  - apply le_trans with (n := S n2 + n1).
+    + apply le_plus_l.
+    + simpl. rewrite plus_comm. apply H.
+Qed.
 
 Theorem leb_complete : forall n m,
   n <=? m = true -> n <= m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  induction n as [| n' IHn'].
+  - intros m H. apply O_le_n.
+  - intros m.
+    intros H.
+    destruct m as [| m'].
+    + inversion H.
+    + apply IHn' in H.
+      apply n_le_m__Sn_le_Sm.
+      apply H.
+Qed.
 
 (** Hint: The next one may be easiest to prove by induction on [m]. *)
 
@@ -767,21 +850,45 @@ Theorem leb_correct : forall n m,
   n <= m ->
   n <=? m = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m.
+  generalize dependent n.
+  induction m as [| m' IHm'].
+  - intros n H.
+    inversion H. trivial.
+  - intros n H.
+    destruct n as [| n'].
+    + simpl. reflexivity.
+    + simpl.
+      apply Sn_le_Sm__n_le_m in H.
+      apply IHm' in H.
+      apply H.
+Qed.
 
 (** Hint: The next one can easily be proved without using [induction]. *)
 
 Theorem leb_true_trans : forall n m o,
   n <=? m = true -> m <=? o = true -> n <=? o = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m o.
+  intros H1 H2.
+  apply leb_correct.
+  apply leb_complete in H1.
+  apply leb_complete in H2.
+  apply le_trans with (n := m).
+  apply H1.
+  apply H2.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (leb_iff)  *)
 Theorem leb_iff : forall n m,
   n <=? m = true <-> n <= m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m.
+  split.
+  - intros H. apply leb_complete. apply H.
+  - intros H. apply leb_correct. apply H.
+Qed.
 (** [] *)
 
 Module R.
