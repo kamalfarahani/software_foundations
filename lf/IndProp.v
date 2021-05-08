@@ -1325,10 +1325,74 @@ Qed.
     Prove that [reg_exp_of_list] satisfies the following
     specification: *)
 
+Lemma reg_exp_of_list_app_the_same: forall (T: Type) (n m: T) (l : list T) (re : reg_exp T),
+  n :: l =~ App (Char m) re <-> n = m /\ l =~ re.
+Proof.
+  intros T n m l re.
+  split.
+    - intros H.
+      assert ( n :: l = [n] ++ l) as H'.
+      { reflexivity. }
+      rewrite H' in H.
+      inversion H.
+      inversion H3.
+      rewrite <- H5 in H1.
+      rewrite -> H7 in H1.
+      simpl in H1.
+      injection H1 as H1' H1''.
+      rewrite H1'' in H4.
+      split.
+        + symmetry.
+          apply H1'.
+        + apply H4.
+    - intros H.
+      destruct H as [H' H''].
+      apply (MApp [n]).
+      + rewrite H'.
+        apply MChar.
+      + apply H''.
+Qed.
+
+Lemma reg_exp_of_list_match_input: forall (T : Type) (l : list T),
+  l =~ (reg_exp_of_list l).
+Proof.
+  intros T l.
+  induction l as [| n l' IHl'].
+  - simpl. apply MEmpty.
+  - simpl.
+    apply reg_exp_of_list_app_the_same.
+    split.
+    + reflexivity.
+    + apply IHl'.
+Qed.
+
 Lemma reg_exp_of_list_spec : forall T (s1 s2 : list T),
   s1 =~ reg_exp_of_list s2 <-> s1 = s2.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros T s1 s2.
+  split.
+  - generalize dependent s1.
+    induction s2 as [| n s2' IHs2].
+    + intros s1 H. simpl in H.
+      inversion H. reflexivity.
+    + intros s1 H.
+      destruct s1 as [| n' s1'].
+      * simpl in H.
+        inversion H.
+        inversion H3.
+        rewrite <- H5 in H1.
+        simpl in H1.
+        discriminate H1.
+      * simpl in H.
+        apply reg_exp_of_list_app_the_same in H.
+        destruct H as [H' H''].
+        f_equal.
+        apply H'.
+        apply IHs2 in H''. apply H''.
+  - intros H.
+    rewrite H.
+    apply reg_exp_of_list_match_input.
+Qed.
 (** [] *)
 
 (** Since the definition of [exp_match] has a recursive
