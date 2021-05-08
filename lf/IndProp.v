@@ -1281,13 +1281,21 @@ Qed.
 Lemma empty_is_empty : forall T (s : list T),
   ~ (s =~ EmptySet).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros T s H.
+  inversion H.
+Qed.
 
 Lemma MUnion' : forall T (s : list T) (re1 re2 : reg_exp T),
   s =~ re1 \/ s =~ re2 ->
   s =~ Union re1 re2.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros T s re1 re2 H.
+  destruct H as [H1 | H2].
+  - apply MUnionL.
+    apply H1.
+  - apply MUnionR.
+    apply H2.
+Qed.
 
 (** The next lemma is stated in terms of the [fold] function from the
     [Poly] chapter: If [ss : list (list T)] represents a sequence of
@@ -1298,7 +1306,18 @@ Lemma MStar' : forall T (ss : list (list T)) (re : reg_exp T),
   (forall s, In s ss -> s =~ re) ->
   fold app ss [] =~ Star re.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros T ss re H.
+  induction ss as [| s ss' IH].
+  - simpl. apply MStar0.
+  - simpl. simpl in H.
+    apply (MStarApp s).
+    + apply (H s). left. reflexivity.
+    + apply IH.
+      intros s0.
+      intros H'.
+      apply H.
+      right. apply H'.
+Qed.
 (** [] *)
 
 (** **** Exercise: 4 stars, standard, optional (reg_exp_of_list_spec) 
