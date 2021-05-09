@@ -1481,13 +1481,58 @@ Qed.
     regular expression matches some string. Prove that your function
     is correct. *)
 
-Fixpoint re_not_empty {T : Type} (re : reg_exp T) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint re_not_empty {T : Type} (re : reg_exp T) : bool :=
+  match re with
+  | EmptySet => false
+  | EmptyStr => true
+  | Char _ => true
+  | App re1 re2 => andb (re_not_empty re1) (re_not_empty re2)
+  | Union re1 re2 => orb (re_not_empty re1) (re_not_empty re2)
+  | Star _ => true
+  end.
+
 
 Lemma re_not_empty_correct : forall T (re : reg_exp T),
   (exists s, s =~ re) <-> re_not_empty re = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros T re.
+  split.
+  - intros H.
+    destruct H as [x Hmatch].
+    induction Hmatch
+    as [ | x' | s1 re1 s2 re2 Hmatch1 IH1 Hmatch2 IH2
+      | s1 re1 re2 Hmatch IH | re1 s2 re2 Hmatch IH
+      | re | s1 s2 re Hmatch1 IH1 Hmatch2 IH2 ].
+    + simpl. reflexivity.
+    + simpl. reflexivity.
+    + simpl. rewrite IH1. rewrite IH2. simpl. reflexivity.
+    + simpl. rewrite IH. simpl. reflexivity.
+    + simpl. rewrite orb_true_iff.
+      right. rewrite IH. reflexivity.
+    + simpl. reflexivity.
+    + simpl. reflexivity.
+  - intros H.
+    induction re as [].
+    + simpl in H. discriminate H.
+    + exists []. apply MEmpty.
+    + exists [t]. apply MChar.
+    + simpl in H. apply andb_true_iff in H.
+      destruct H as [H1 H2].
+      apply IHre1 in H1. apply IHre2 in H2.
+      destruct H1 as [s1 H1'].
+      destruct H2 as [s2 H2'].
+      exists (s1 ++ s2).
+      apply (MApp s1). assumption. assumption.
+    + simpl in H. rewrite orb_true_iff in H.
+      destruct H as [H1 | H2].
+      * apply IHre1 in H1.
+        destruct H1 as [s H1'].
+        exists s. apply MUnionL. assumption.
+      * apply IHre2 in H2.
+        destruct H2 as [s H2'].
+        exists s. apply MUnionR. assumption.
+    + exists []. apply MStar0.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
