@@ -1790,7 +1790,7 @@ Qed.
 Lemma napp_star :
   forall T m s1 s2 (re : reg_exp T),
     s1 =~ re -> s2 =~ Star re ->
-    napp m s1 ++ s2 =~ Star re.
+    napp m (s1 ++ s2) =~ Star re.
 Proof.
   intros T m s1 s2 re Hs1 Hs2.
   induction m.
@@ -1800,6 +1800,11 @@ Proof.
     + apply Hs1.
     + apply IHm.
 Qed.
+
+Lemma length_gte_1_not_nil: forall (T : Type) (l : list T),
+  length l >= 1 -> l <> [].
+Proof.
+Admitted.
 
 (** The (weak) pumping lemma itself says that, if [s =~ re] and if the
     length of [s] is at least the pumping constant of [re], then [s]
@@ -1829,7 +1834,84 @@ Proof.
        | re | s1 s2 re Hmatch1 IH1 Hmatch2 IH2 ].
   - (* MEmpty *)
     simpl. intros contra. inversion contra.
-  (* FILL IN HERE *) Admitted.
+  - simpl. intros contra. inversion contra. inversion H0.
+  - simpl. intros H.
+    rewrite app_length in H.
+    apply add_le_cases in H.
+    destruct H as [H1 | H2].
+    + apply IH1 in H1.
+      destruct H1 as [s1' [s2' [s3' [H1' [H1'' H1''']]]]].
+      exists s1', s2', (s3' ++ s2).
+      split.
+      * rewrite H1'.
+        rewrite <- app_assoc. rewrite <- app_assoc.
+        reflexivity.
+      * split.
+        ** assumption.
+        ** intros m.
+           assert (s1' ++ napp m s2' ++ s3' ++ s2 = (s1' ++ napp m s2' ++ s3') ++ s2) as Htmp.
+           { rewrite app_assoc. rewrite app_assoc. rewrite app_assoc.  reflexivity. }
+           rewrite Htmp.
+           apply MApp.
+           *** apply (H1''' m).
+           *** apply Hmatch2.
+    + apply IH2 in H2.
+      destruct H2 as [s1' [s2' [s3' [H2' [H2'' H2''']]]]].
+      exists (s1 ++ s1'), s2', s3'.
+      split.
+        * rewrite H2'.
+           rewrite app_assoc. rewrite app_assoc. reflexivity.
+        * split.
+          ** assumption.
+          ** intros m.
+              rewrite <- app_assoc.
+              apply MApp.
+              *** assumption.
+              *** apply (H2''' m).
+    - simpl. intros H.
+      apply plus_le in H.
+      destruct H as [H1 H2].
+      apply IH in H1.
+      destruct H1 as [s1' [s2' [s3' [H1' [H1'' H1''']]]]].
+      exists s1', s2', s3'.
+      split.
+      + assumption.
+      + split.
+        * assumption.
+        * intros m.
+          apply MUnionL.
+          apply H1'''.
+    - simpl. intros H.
+      apply plus_le in H.
+      destruct H as [H1 H2].
+      apply IH in H2.
+      destruct H2 as [s1' [s2' [s3' [H2' [H2'' H2''']]]]].
+      exists s1', s2', s3'.
+      split.
+      + assumption.
+      + split.
+        * assumption.
+        * intros m.
+          apply MUnionR.
+          apply H2'''.
+    - simpl. intros contra. 
+      inversion contra.
+      apply pumping_constant_0_false in H0.
+      exfalso. assumption.
+    - simpl. intros H.
+      simpl in IH2.
+      exists [], (s1 ++ s2), [].
+      simpl.
+      split.
+      + rewrite app_nil_r. reflexivity.
+      + split.
+        * assert (1 <= length (s1 ++ s2)) as H'.
+          { apply le_trans with (n := pumping_constant re).
+            apply pumping_constant_ge_1. assumption. }
+          apply length_gte_1_not_nil. assumption.
+        * intros m. rewrite app_nil_r.
+          apply (napp_star T m s1 s2 re Hmatch1 Hmatch2).
+Qed.
 (** [] *)
 
 (** **** Exercise: 5 stars, advanced, optional (pumping) 
