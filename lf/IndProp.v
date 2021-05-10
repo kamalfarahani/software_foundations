@@ -1790,7 +1790,7 @@ Qed.
 Lemma napp_star :
   forall T m s1 s2 (re : reg_exp T),
     s1 =~ re -> s2 =~ Star re ->
-    napp m (s1 ++ s2) =~ Star re.
+    napp m s1 ++ s2 =~ Star re.
 Proof.
   intros T m s1 s2 re Hs1 Hs2.
   induction m.
@@ -1803,6 +1803,41 @@ Qed.
 
 Lemma length_gte_1_not_nil: forall (T : Type) (l : list T),
   length l >= 1 -> l <> [].
+Proof.
+Admitted.
+
+Lemma le_nat_plus_sides: forall (a b c d : nat),
+  a <= c /\ b <= d -> a + b <= c + d.
+Proof.
+Admitted.
+
+Lemma or_to_inclusive_or: forall (P Q : Prop),
+  P \/ Q -> (P /\ ~ Q) \/ (~ P /\ Q) .
+Proof.
+Admitted.
+
+Lemma not_le: forall (n m : nat),
+  ~ (n <= m) -> m <= n.
+Proof.
+Admitted.
+
+Lemma star_empty: forall (T : Type) (l : list T),
+  l =~ Star EmptyStr -> l = [].
+Proof.
+Admitted.
+
+Lemma empty_star: forall (T : Type) (l : list T) (re: reg_exp T),
+  [] =~ re -> l =~ Star re -> l = [].
+Proof.
+Admitted.
+
+Lemma x_app_list_not_nil: forall (T : Type) (l : list T) (x : T),
+  x :: l <> [].
+Proof.
+Admitted.
+
+Lemma pumping_constant_match: forall (T : Type) (l : list T) (re : reg_exp T),
+  l =~ re -> length l <= pumping_constant re.
 Proof.
 Admitted.
 
@@ -1900,17 +1935,21 @@ Proof.
       exfalso. assumption.
     - simpl. intros H.
       simpl in IH2.
-      exists [], (s1 ++ s2), [].
+      exists [], s1, s2.
       simpl.
       split.
-      + rewrite app_nil_r. reflexivity.
-      + split.
-        * assert (1 <= length (s1 ++ s2)) as H'.
-          { apply le_trans with (n := pumping_constant re).
-            apply pumping_constant_ge_1. assumption. }
-          apply length_gte_1_not_nil. assumption.
-        * intros m. rewrite app_nil_r.
-          apply (napp_star T m s1 s2 re Hmatch1 Hmatch2).
+        + reflexivity.
+        + split.
+          * destruct s1.
+            ** apply (empty_star T s2 re Hmatch1) in Hmatch2.
+              rewrite Hmatch2 in H.
+              simpl in H.
+              inversion H.
+              apply pumping_constant_0_false in H1.
+              destruct H1.
+            ** apply x_app_list_not_nil.
+          * intros m.
+            apply (napp_star T m s1 s2 re Hmatch1 Hmatch2).
 Qed.
 (** [] *)
 
@@ -1931,14 +1970,123 @@ Lemma pumping : forall T (re : reg_exp T) s,
 
 (** You may want to copy your proof of weak_pumping below. *)
 Proof.
-  intros T re s Hmatch.
-  induction Hmatch
-    as [ | x | s1 re1 s2 re2 Hmatch1 IH1 Hmatch2 IH2
-       | s1 re1 re2 Hmatch IH | re1 s2 re2 Hmatch IH
-       | re | s1 s2 re Hmatch1 IH1 Hmatch2 IH2 ].
-  - (* MEmpty *)
-    simpl. intros contra. inversion contra.
-  (* FILL IN HERE *) Admitted.
+  Proof.
+    intros T re s Hmatch.
+    induction Hmatch
+      as [ | x | s1 re1 s2 re2 Hmatch1 IH1 Hmatch2 IH2
+         | s1 re1 re2 Hmatch IH | re1 s2 re2 Hmatch IH
+         | re | s1 s2 re Hmatch1 IH1 Hmatch2 IH2 ].
+    - (* MEmpty *)
+      simpl. intros contra. inversion contra.
+    - simpl. intros contra. inversion contra. inversion H0.
+    - simpl. intros H.
+      rewrite app_length in H.
+      apply add_le_cases in H.
+      apply or_to_inclusive_or in H.
+      destruct H as [[H1 H1_Inc] | [H2_Inc H2]].
+      + apply IH1 in H1.
+        destruct H1 as [s1' [s2' [s3' [H1' [H1'' [H1''' H1'''']]]]]].
+        exists s1', s2', (s3' ++ s2).
+        split.
+        * rewrite H1'.
+          rewrite <- app_assoc. rewrite <- app_assoc.
+          reflexivity.
+        * split.
+          ** assumption.
+          ** split.
+            *** apply le_trans with (n := pumping_constant re1).
+                **** assumption.
+                **** apply le_plus_l.
+            *** intros m.
+                assert (s1' ++ napp m s2' ++ s3' ++ s2 = (s1' ++ napp m s2' ++ s3') ++ s2) as Htmp.
+                { rewrite app_assoc. rewrite app_assoc. rewrite app_assoc.  reflexivity. }
+                rewrite Htmp.
+                apply MApp.
+                **** apply (H1'''' m).
+                **** apply Hmatch2.
+      + apply IH2 in H2.
+        destruct H2 as [s1' [s2' [s3' [H2' [H2'' [H2''' H2'''']]]]]].
+        exists (s1 ++ s1'), s2', s3'.
+        split.
+          * rewrite H2'.
+             rewrite app_assoc. rewrite app_assoc. reflexivity.
+          * split.
+            ** assumption.
+            ** split.
+              *** rewrite app_length.
+                  rewrite <- plus_assoc.
+                  apply le_nat_plus_sides.
+                  split.
+                    **** apply not_le in H2_Inc. assumption.
+                    **** assumption.
+              *** intros m.
+                  rewrite <- app_assoc.
+                  apply MApp.
+                  **** assumption.
+                  **** apply (H2'''' m).
+    - simpl. intros H.
+      apply plus_le in H.
+      destruct H as [H1 H2].
+      apply IH in H1.
+      destruct H1 as [s1' [s2' [s3' [H1' [H1'' H1''']]]]].
+      exists s1', s2', s3'.
+      split.
+      + assumption.
+      + split.
+        * assumption.
+        * destruct H1''' as [E1 E2].
+          split.
+          ** apply le_trans with (n := pumping_constant re1).
+             *** assumption.
+             *** apply le_plus_l.
+          ** intros m.
+             apply MUnionL.
+             apply E2.
+    - simpl. intros H.
+      apply plus_le in H.
+      destruct H as [H1 H2].
+      apply IH in H2.
+      destruct H2 as [s1' [s2' [s3' [H2' [H2'' H2''']]]]].
+      exists s1', s2', s3'.
+      split.
+      + assumption.
+      + split.
+        * assumption.
+        * destruct H2''' as [E1 E2].
+          split.
+          ** assert (pumping_constant re1 + pumping_constant re2 = pumping_constant re2 + pumping_constant re1) as Htmp.
+             { rewrite plus_comm. reflexivity. }
+             rewrite Htmp.
+             apply le_trans with (n := pumping_constant re2).
+              *** assumption.
+              *** apply le_plus_l.
+          ** intros m.
+             apply MUnionR.
+             apply E2.
+    - simpl. intros contra.
+      inversion contra.
+      apply pumping_constant_0_false in H0.
+      exfalso. assumption.
+    - simpl. intros H.
+      simpl in IH2.
+      exists [], s1, s2.
+      simpl.
+      split.
+      + reflexivity.
+      + split.
+        * destruct s1.
+          ** apply (empty_star T s2 re Hmatch1) in Hmatch2.
+             rewrite Hmatch2 in H.
+             simpl in H.
+             inversion H.
+             apply pumping_constant_0_false in H1.
+             destruct H1.
+          ** apply x_app_list_not_nil.
+        * split.
+            ** apply pumping_constant_match. assumption.
+            ** intros m.
+               apply (napp_star T m s1 s2 re Hmatch1 Hmatch2).
+Qed.
 
 End Pumping.
 (** [] *)
