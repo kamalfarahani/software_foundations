@@ -2161,7 +2161,15 @@ Qed.
 (** **** Exercise: 2 stars, standard, especially useful (reflect_iff)  *)
 Theorem reflect_iff : forall P b, reflect P b -> (P <-> b = true).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P b H.
+  split.
+  - destruct H.
+    + intros H'. reflexivity.
+    + intros H'. apply H in H'. destruct H'.
+  - destruct H.
+    + intros H'. apply H.
+    + intros H'. discriminate H'.
+Qed.
 (** [] *)
 
 (** The advantage of [reflect] over the normal "if and only if"
