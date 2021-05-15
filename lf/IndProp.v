@@ -2220,7 +2220,21 @@ Fixpoint count n l :=
 Theorem eqbP_practice : forall n l,
   count n l = 0 -> ~(In n l).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n l.
+  induction l as [| n' l' IHl'].
+  - simpl. intros _ F. apply F.
+  - simpl.
+    destruct (eqbP n n') as [H | H].
+    + intros H'. discriminate H'.
+    + simpl. intros H' H''.
+      destruct H'' as [H1 | H2].
+      * symmetry in H1.
+        apply H in H1.
+        destruct H1.
+      * apply IHl' in H'.
+        apply H' in H2.
+        destruct H2.
+Qed.
 (** [] *)
 
 (** This small example shows how reflection gives us a small gain in
