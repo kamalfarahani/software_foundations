@@ -512,8 +512,8 @@ Definition some_nat_is_even : exists n, ev n :=
 
     Construct a proof object for the following proposition. *)
 
-Definition ex_ev_Sn : ex (fun n => ev (S n))
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition ex_ev_Sn : ex (fun n => ev (S n)) :=
+  ex_intro (fun x => ev (S x)) 1 (ev_SS 0 (ev_0)).
 (** [] *)
 
 (* ================================================================= *)
