@@ -400,8 +400,15 @@ Definition and_comm' P Q : P /\ Q <-> Q /\ P :=
 
     Construct a proof object for the following proposition. *)
 
-Definition conj_fact : forall P Q R, P /\ Q -> Q /\ R -> P /\ R
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition conj_fact : forall P Q R, P /\ Q -> Q /\ R -> P /\ R :=
+  fun(P Q R : Prop) => 
+    fun(HPQ : P /\ Q) => 
+      fun(HQR : Q /\ R) => match HPQ with
+                           | conj HP HQ => 
+                             match HQR with
+                             | conj HQ HR => conj HP HR
+                             end
+                           end.
 (** [] *)
 
 (* ================================================================= *)
