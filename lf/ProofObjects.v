@@ -566,8 +566,8 @@ Definition false_implies_zero_eq_one : False -> 0 = 1 :=
 
     Construct a proof object for the following proposition. *)
 
-Definition ex_falso_quodlibet' : forall P, False -> P
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition ex_falso_quodlibet' : forall P, False -> P :=
+  fun P contra => match contra with end.
 (** [] *)
 
 End Props.
