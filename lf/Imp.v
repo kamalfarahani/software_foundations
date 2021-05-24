@@ -483,9 +483,52 @@ Qed.
     optimization and its correctness proof -- and build up to
     something more interesting incrementially.)  *)
 
-(* FILL IN HERE
+Fixpoint optimize_0minus (a:aexp) : aexp :=
+  match a with
+  | ANum n => ANum n
+  | APlus  e1 e2 => APlus  (optimize_0minus e1) (optimize_0minus e2)
+  | AMinus e1 (ANum 0) => (optimize_0minus e1)
+  | AMinus e1 e2 => AMinus (optimize_0minus e1) (optimize_0minus e2)
+  | AMult  e1 e2 => AMult  (optimize_0minus e1) (optimize_0minus e2)
+  end.
 
-    [] *)
+Theorem optimize_0minus_sound: forall a: aexp,
+  aeval (optimize_0minus a) = aeval a.
+Proof.
+  intros a.
+  induction a;
+    try (simpl; rewrite IHa1; rewrite IHa2; reflexivity);
+    try (reflexivity).
+  - destruct a2 eqn:E1;
+    try (simpl; simpl in IHa2; rewrite IHa1; rewrite IHa2; reflexivity)
+    + destruct n eqn:E2.
+      * simpl. rewrite Nat.sub_0_r. rewrite IHa1. reflexivity.
+      * simpl. rewrite IHa1. reflexivity.
+Qed.
+
+Fixpoint optimize_0mult (a: aexp) : aexp :=
+  match a with
+  | ANum n => ANum n
+  | APlus e1 e2 => APlus (optimize_0mult e1) (optimize_0mult e2)
+  | AMinus e1 e2 => AMinus (optimize_0mult e1) (optimize_0mult e2)
+  | AMult e1 (ANum 0) => ANum 0
+  | AMult e1 e2 => AMult (optimize_0mult e1) (optimize_0mult e2)
+  end.
+
+Theorem optimize_0mult_sound: forall a: aexp,
+  aeval (optimize_0mult a) = aeval a.
+Proof.
+  intros a.
+  induction a;
+  try (simpl; rewrite IHa1; rewrite IHa2; reflexivity);
+  try (reflexivity).
+  - destruct a2 eqn:E1;
+    try (simpl; simpl in IHa2; rewrite IHa1; rewrite IHa2; reflexivity).
+    + destruct n eqn:E2.
+      * simpl. rewrite <- mult_n_O. reflexivity.
+      * simpl. rewrite IHa1. reflexivity.
+Qed.
+
 
 (* ================================================================= *)
 (** ** Defining New Tactic Notations *)
