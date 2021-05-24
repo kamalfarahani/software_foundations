@@ -446,13 +446,31 @@ Admitted.
     it is sound.  Use the tacticals we've just seen to make the proof
     as elegant as possible. *)
 
-Fixpoint optimize_0plus_b (b : bexp) : bexp
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint optimize_0plus_b (b : bexp) : bexp :=
+  match b with
+  | BTrue => BTrue
+  | BFalse => BFalse
+  | BEq a1 a2 => BEq (optimize_0plus a1) (optimize_0plus a2)
+  | BLe a1 a2 => BLe (optimize_0plus a1) (optimize_0plus a2)
+  | BNot bexp => BNot (optimize_0plus_b bexp)
+  | BAnd bexp1 bexp2 => BAnd (optimize_0plus_b bexp1) (optimize_0plus_b bexp2)
+  end.
 
 Theorem optimize_0plus_b_sound : forall b,
   beval (optimize_0plus_b b) = beval b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b.
+  induction b;
+    try (simpl; rewrite optimize_0plus_sound; rewrite optimize_0plus_sound);
+    try (reflexivity).
+  - simpl.
+    rewrite IHb.
+    reflexivity.
+  - simpl.
+    rewrite IHb1.
+    rewrite IHb2.
+    reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 4 stars, standard, optional (optimize) 
