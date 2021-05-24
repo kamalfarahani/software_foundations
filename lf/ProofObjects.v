@@ -640,7 +640,11 @@ Definition singleton : forall (X:Type) (x:X), []++[x] == x::[]  :=
 Lemma equality__leibniz_equality : forall (X : Type) (x y: X),
   x == y -> forall P:X->Prop, P x -> P y.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros X x y H.
+  intros P HPx.
+  destruct H as [x'].
+  apply HPx.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (leibniz_equality__equality) 
@@ -653,8 +657,9 @@ Proof.
 Lemma leibniz_equality__equality : forall (X : Type) (x y: X),
   (forall P:X->Prop, P x -> P y) -> x == y.
 Proof.
-(* FILL IN HERE *) Admitted.
-
+  intros X x y H.
+  apply (H (eq x) (eq_refl x)).
+Qed.
 (** [] *)
 
 End MyEquality.
