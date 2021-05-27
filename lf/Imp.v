@@ -804,19 +804,15 @@ Inductive aevalR : aexp -> nat -> Prop :=
 
     Write out a corresponding definition of boolean evaluation as a
     relation (in inference rule notation). *)
-Inductive bevalR : bexp -> bool -> Prop :=
+(* Inductive bevalR : bexp -> bool -> Prop :=
   | E_BTrue : bevalR BTrue true
   | E_BFalse : bevalR BFalse false
-  | E_BEq (a1 a2 : aexp) (n1 n2 : nat) 
-      (H1 : aevalR a1 n1)
-      (H2 : aevalR a2 n2) : bevalR (BEq a1 a2) (n1 =? n2)
-  | E_BLe (a1 a2 : aexp) (n1 n2 : nat)
-      (H1 : aevalR a1 n1)
-      (H2 : aevalR a2 n2) : bevalR (BLe a1 a2) (n1 <=? n2)
-  | E_BNot (be : bexp) (b : bool) (H : bevalR be b) : bevalR be (negb b)
+  | E_BEq (a1 a2 : aexp) : bevalR (BEq a1 a2) (aeval a1 =? aeval a2)
+  | E_BLe (a1 a2 : aexp) : bevalR (BLe a1 a2) (aeval a1 <=? aeval a2)
+  | E_BNot (be : bexp) (b : bool) (H : bevalR be b) : bevalR (BNot be) (negb b)
   | E_BAnd (be1 be2 : bexp) (b1 b2 : bool)
       (H1 : bevalR be1 b1)
-      (H2 : bevalR be2 b2) : bevalR (BAnd be1 be2) (andb b1 b2).
+      (H2 : bevalR be2 b2) : bevalR (BAnd be1 be2) (andb b1 b2). *)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_beval_rules : option (nat*string) := None.
@@ -886,14 +882,42 @@ Qed.
 
 Reserved Notation "e '==>b' b" (at level 90, left associativity).
 Inductive bevalR: bexp -> bool -> Prop :=
-(* FILL IN HERE *)
+  | E_BTrue : bevalR BTrue true
+  | E_BFalse : bevalR BFalse false
+  | E_BEq (a1 a2 : aexp) : bevalR (BEq a1 a2) (aeval a1 =? aeval a2)
+  | E_BLe (a1 a2 : aexp) : bevalR (BLe a1 a2) (aeval a1 <=? aeval a2)
+  | E_BNot (be : bexp) (b : bool) (H : bevalR be b) : bevalR (BNot be) (negb b)
+  | E_BAnd (be1 be2 : bexp) (b1 b2 : bool)
+      (H1 : bevalR be1 b1)
+      (H2 : bevalR be2 b2) : bevalR (BAnd be1 be2) (andb b1 b2)
 where "e '==>b' b" := (bevalR e b) : type_scope
 .
 
 Lemma beval_iff_bevalR : forall b bv,
   b ==>b bv <-> beval b = bv.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b bv.
+  split.
+  - intros H.
+    induction H;
+    simpl;
+    try (reflexivity).
+    + rewrite IHbevalR. reflexivity.
+    + rewrite IHbevalR1. rewrite IHbevalR2. reflexivity.
+  - generalize dependent bv.
+    induction b;
+    intros bv H;
+    simpl in H;
+    rewrite <- H.
+    + apply E_BTrue.
+    + apply E_BFalse.
+    + apply E_BEq.
+    + apply E_BLe.
+    + apply E_BNot. apply IHb. reflexivity.
+    + apply E_BAnd.
+      * apply IHb1. reflexivity.
+      * apply IHb2. reflexivity.
+Qed.
 (** [] *)
 
 End AExp.
