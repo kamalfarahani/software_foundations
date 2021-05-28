@@ -1602,7 +1602,12 @@ Example ceval_example2:
     Z := 2
   ]=> (Z !-> 2 ; Y !-> 1 ; X !-> 0).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  apply E_Seq with (st' := X !-> 0).
+  - apply E_Ass. reflexivity.
+  - apply E_Seq with (st' := Y !-> 1; X !-> 0).
+    + apply E_Ass. simpl. reflexivity.
+    + apply E_Ass. simpl. reflexivity.
+Qed.
 (** [] *)
 
 Set Printing Implicit.
