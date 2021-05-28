@@ -1735,13 +1735,20 @@ Proof.
   intros st st' contra. unfold loop in contra.
   remember <{ while true do skip end }> as loopdef
            eqn:Heqloopdef.
-
-  (** Proceed by induction on the assumed derivation showing that
-      [loopdef] terminates.  Most of the cases are immediately
-      contradictory (and so can be solved in one step with
-      [discriminate]). *)
-
-  (* FILL IN HERE *) Admitted.
+  induction contra.
+  - inversion Heqloopdef.
+  - inversion Heqloopdef.
+  - inversion Heqloopdef.
+  - inversion Heqloopdef.
+  - inversion Heqloopdef.
+  - inversion Heqloopdef.
+    rewrite H1 in H. simpl in H. discriminate H.
+  - inversion Heqloopdef.
+    rewrite H1 in IHcontra2.
+    rewrite H2 in IHcontra2.
+    apply IHcontra2.
+    reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (no_whiles_eqv) 
