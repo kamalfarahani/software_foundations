@@ -1621,15 +1621,33 @@ Check @ceval_example2.
     which you can reverse-engineer to discover the program you should
     write.  The proof of that theorem will be somewhat lengthy. *)
 
-Definition pup_to_n : com
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition pup_to_n : com :=
+  <{ Y := 0; 
+     while ~(X = 0) do 
+      Y := Y + X;
+      X := X - 1
+     end }>.
 
 Theorem pup_to_2_ceval :
   (X !-> 2) =[
     pup_to_n
   ]=> (X !-> 0 ; Y !-> 3 ; X !-> 1 ; Y !-> 2 ; Y !-> 0 ; X !-> 2).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold pup_to_n.
+  apply E_Seq with (st' := Y !-> 0; X !-> 2).
+  - apply E_Ass. simpl. reflexivity.
+  - apply E_WhileTrue with (st' := X !-> 1 ; Y !-> 2 ; Y !-> 0 ; X !-> 2).
+    + simpl. reflexivity.
+    + apply E_Seq with (st' := Y !-> 2 ; Y !-> 0 ; X !-> 2).
+      * apply E_Ass. simpl. reflexivity.
+      * apply E_Ass. simpl. reflexivity.
+    + apply E_WhileTrue with (st' := X !-> 0; Y !-> 3 ;X !-> 1 ; Y !-> 2 ; Y !-> 0 ; X !-> 2).
+      * simpl. reflexivity.
+      * apply E_Seq with (st' := Y !-> 3 ; X !-> 1 ; Y !-> 2 ; Y !-> 0 ; X !-> 2).
+        ** apply E_Ass. simpl. reflexivity.
+        ** apply E_Ass. simpl. reflexivity.
+      * apply E_WhileFalse. simpl. reflexivity.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
