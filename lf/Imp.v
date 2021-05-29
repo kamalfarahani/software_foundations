@@ -1775,13 +1775,49 @@ Fixpoint no_whiles (c : com) : bool :=
     while loops.  Then prove its equivalence with [no_whiles]. *)
 
 Inductive no_whilesR: com -> Prop :=
- (* FILL IN HERE *)
-.
+  | N_Skip : no_whilesR CSkip
+  | N_Ass (x : string) (e : aexp): no_whilesR (<{x := e}>)
+  | N_Seq (c1 c2 : com) 
+          (H1 : no_whilesR c1)
+          (H2 : no_whilesR c2): no_whilesR (<{c1; c2}>)
+  | N_If (c1 c2 : com) 
+         (b : bexp)
+         (H1 : no_whilesR c1) 
+         (H2 : no_whilesR c2): no_whilesR (<{ if b then c1 else c2 end }>).
 
 Theorem no_whiles_eqv:
    forall c, no_whiles c = true <-> no_whilesR c.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  split.
+  - intros H.
+    induction c;
+    try (simpl in H;
+         rewrite andb_true_iff in H;
+         destruct H as [H1 H2];
+         apply IHc1 in H1;
+         apply IHc2 in H2). 
+    + apply N_Skip.
+    + apply N_Ass.
+    + apply N_Seq.
+      * assumption.
+      * assumption.
+    + apply N_If.
+      * assumption.
+      * assumption.
+    + simpl in H. discriminate H.
+  - intros H.
+    induction H.
+    + simpl. reflexivity.
+    + simpl. reflexivity.
+    + simpl. rewrite andb_true_iff.
+      split.
+      * assumption.
+      * assumption.
+    + simpl. rewrite andb_true_iff.
+      split.
+      * assumption.
+      * assumption.
+Qed.
 (** [] *)
 
 (** **** Exercise: 4 stars, standard (no_whiles_terminating) 
