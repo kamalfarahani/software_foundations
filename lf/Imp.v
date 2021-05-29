@@ -1827,7 +1827,60 @@ Qed.
 
     Use either [no_whiles] or [no_whilesR], as you prefer. *)
 
-(* FILL IN HERE *)
+Theorem no_whiles_terminating: forall c st,
+  no_whilesR c -> exists st', st =[ c ]=> st'.
+Proof.
+  intros c st H.
+  generalize dependent st.
+  induction c.
+  - intro st. exists st. apply E_Skip.
+  - intro st. exists (x !-> aeval st a ; st).
+    apply E_Ass. reflexivity.
+  - intro st.
+    rewrite <- no_whiles_eqv in H.
+    simpl in H. rewrite andb_true_iff in H.
+    destruct H as [H1 H2].
+    rewrite <- no_whiles_eqv in IHc1.
+    rewrite <- no_whiles_eqv in IHc2.
+    remember (IHc1 H1 st) as H1'.
+    destruct H1' as [st' H1'].
+    destruct c2.
+    + exists st'. apply E_Seq with (st' := st').
+      * assumption.
+      * apply E_Skip.
+    + exists (x !-> aeval st' a; st'). apply E_Seq with (st' := st').
+      * assumption.
+      * apply E_Ass. reflexivity.
+    + remember (IHc2 H2 st') as EH.
+      destruct EH as [st'' H'].
+      exists st''. apply E_Seq with (st' := st').
+      * assumption.
+      * assumption.
+    + remember (IHc2 H2 st') as EH.
+      destruct EH as [st'' H'].
+      exists st''. apply E_Seq with (st' := st').
+      * assumption.
+      * assumption.
+    + simpl in H2. discriminate H2.
+  - intros st. rewrite <- no_whiles_eqv in H.
+    simpl in H. rewrite andb_true_iff in H.
+    destruct H as [H1 H2].
+    rewrite <- no_whiles_eqv in IHc1.
+    rewrite <- no_whiles_eqv in IHc2.
+    destruct (beval st b) eqn:E.
+    + remember (IHc1 H1 st) as EH.
+      destruct EH as [st' H'].
+      exists st'. apply E_IfTrue.
+      * assumption.
+      * assumption.
+    + remember (IHc2 H2 st) as EH.
+      destruct EH as [st' H'].
+      exists st'. apply E_IfFalse.
+      * assumption.
+      * assumption.
+  - rewrite <- no_whiles_eqv in H.
+    simpl in H. discriminate H.
+Qed.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_no_whiles_terminating : option (nat*string) := None.
