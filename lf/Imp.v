@@ -1959,15 +1959,15 @@ Fixpoint s_execute (st : state) (stack : list nat)
     | SLoad x => s_execute st ((st x) :: stack) p_rest
     | SPlus => match stack with
                | s1 :: s2 :: rest_stack => s_execute st ((s2 + s1) :: rest_stack) p_rest
-               | _ => []
+               | _ => s_execute st stack p_rest
                end
     | SMinus => match stack with
                 | s1 :: s2 :: rest_stack => s_execute st ((s2 - s1) :: rest_stack) p_rest
-                | _ => []
+                | _ => s_execute st stack p_rest
                 end
     | SMult => match stack with
                | s1 :: s2 :: rest_stack => s_execute st ((s2 * s1) :: rest_stack) p_rest
-               | _ => []
+               | _ => s_execute st stack p_rest
                end
     end
   | [] => stack
@@ -2026,8 +2026,30 @@ Qed.
 Theorem execute_app : forall st p1 p2 stack,
     s_execute st stack (p1 ++ p2) = s_execute st (s_execute st stack p1) p2.
 Proof.
-  (* FILL IN HERE *) Admitted.
-
+  intros st p1 p2 stack.
+  generalize dependent stack.
+  induction p1 as [| p p1' IHp2'].
+  - simpl. reflexivity.
+  - intros stack.
+    destruct p.
+    + simpl. apply (IHp2' (n :: stack)).
+    + simpl. apply (IHp2' (st x :: stack)).
+    + destruct stack.
+      * simpl. apply (IHp2' []).
+      * destruct stack.
+        ** simpl. apply (IHp2' [n]).
+        ** simpl. apply (IHp2' (n0 + n :: stack)).
+    + destruct stack.
+      * simpl. apply (IHp2' []).
+      * destruct stack.
+        ** simpl. apply (IHp2' [n]).
+        ** simpl. apply (IHp2' (n0 - n :: stack)).
+    + destruct stack.
+      * simpl. apply (IHp2' []).
+      * destruct stack.
+        ** simpl. apply (IHp2' [n]).
+        ** simpl. apply (IHp2' (n0 * n :: stack)).
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (stack_compiler_correct)  *)
