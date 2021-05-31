@@ -2062,15 +2062,24 @@ Qed.
 Lemma s_compile_correct_aux : forall st e stack,
   s_execute st stack (s_compile e) = aeval st e :: stack.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros st e stack.
+  generalize dependent stack.
+  induction e;
+    try (simpl; reflexivity);
+    try(intro stack; simpl;
+        rewrite execute_app; rewrite execute_app;
+        rewrite IHe1; rewrite IHe2;
+        simpl; reflexivity).
+Qed.
 
 (** The main theorem should be a very easy corollary of that lemma. *)
 
 Theorem s_compile_correct : forall (st : state) (e : aexp),
   s_execute st [] (s_compile e) = [ aeval st e ].
 Proof.
-  (* FILL IN HERE *) Admitted.
-
+  intros st e.
+  apply (s_compile_correct_aux st e).
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (short_circuit) 
