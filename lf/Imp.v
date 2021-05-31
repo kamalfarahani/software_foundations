@@ -2099,9 +2099,25 @@ Qed.
     would _not_ be equivalent to the original, since it would make more
     programs terminate.) *)
 
-(* FILL IN HERE
+Fixpoint beval_short_circuit (st : state) (b : bexp) : bool :=
+  match b with
+  | BAnd b1 b2  => if negb (beval st b1)
+                   then false
+                   else beval st b2
+  | _ => beval st b
+  end.
 
-    [] *)
+Theorem beval_short_circuit_eqv: forall st b,
+  beval st b = beval_short_circuit st b.
+Proof.
+  intros st b.
+  induction b;
+  try(reflexivity).
+  - simpl.
+    destruct (beval st b1) eqn:E.
+    + simpl. reflexivity.
+    + simpl. reflexivity.
+Qed.
 
 Module BreakImp.
 (** **** Exercise: 4 stars, advanced (break_imp) 
