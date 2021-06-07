@@ -399,7 +399,19 @@ Theorem while_true : forall b c,
     <{ while b do c end }>
     <{ while true do skip end }>.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b c Hb st st'.
+  split.
+  - intros H.
+    apply while_true_nonterm in H.
+      + exfalso. assumption.
+      + assumption.
+  - intros H.
+    inversion H.
+    + simpl in H4. discriminate H4.
+    + apply while_true_nonterm in H.
+      * exfalso. assumption.
+      * unfold bequiv. intros. simpl. reflexivity.
+Qed.
 (** [] *)
 
 (** A more interesting fact about [while] commands is that any number
