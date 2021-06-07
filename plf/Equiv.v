@@ -152,7 +152,17 @@ Theorem skip_right : forall c,
     <{ c ; skip }>
     c.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros c st st'.
+  split.
+  - intros H.
+    inversion H. subst.
+    inversion H5. subst.
+    assumption.
+  - intros H.
+    eapply E_Seq.
+    + apply H.
+    + apply E_Skip.
+Qed.
 (** [] *)
 
 (** Similarly, here is a simple transformation that optimizes [if]
