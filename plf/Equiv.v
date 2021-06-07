@@ -278,7 +278,26 @@ Theorem swap_if_branches : forall b c1 c2,
     <{ if b then c1 else c2 end }>
     <{ if ~ b then c2 else c1 end }>.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold cequiv.
+  intros b c1 c2 st st'.
+  split.
+  - intros H.
+    inversion H.
+    + apply E_IfFalse.
+      * simpl. rewrite H5. reflexivity.
+      * assumption.
+    + apply E_IfTrue.
+      * simpl. rewrite H5. reflexivity.
+      * assumption.
+  - intros H.
+    inversion H.
+    + apply E_IfFalse.
+      * simpl in H5. apply negb_true_iff. assumption.
+      * assumption.
+    + apply E_IfTrue.
+      * simpl in H5. apply negb_false_iff. assumption.
+      * assumption.
+Qed.
 (** [] *)
 
 (** For [while] loops, we can give a similar pair of theorems.  A loop
