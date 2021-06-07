@@ -250,7 +250,22 @@ Theorem if_false : forall b c1 c2,
     <{ if b then c1 else c2 end }>
     c2.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b c1 c2 Hb.
+  split.
+  - intros H.
+    inversion H.
+    + unfold bequiv in Hb.
+      simpl in Hb.
+      rewrite (Hb st) in H5.
+      discriminate H5.
+    + assumption.
+  - intros H.
+    apply E_IfFalse.
+    + unfold bequiv in Hb.
+      simpl in Hb.
+      apply (Hb st).
+    + assumption.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (swap_if_branches)
