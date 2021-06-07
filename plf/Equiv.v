@@ -447,7 +447,25 @@ Proof.
 Theorem seq_assoc : forall c1 c2 c3,
   cequiv <{(c1;c2);c3}> <{c1;(c2;c3)}>.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros c1 c2 c3 st st'.
+  split.
+  - intros H.
+    inversion H. subst.
+    inversion H2. subst.
+    eapply E_Seq.
+    + apply H3.
+    + eapply E_Seq.
+      * apply H7.
+      * assumption.
+  - intros H.
+    inversion H. subst.
+    inversion H5. subst.
+    eapply E_Seq.
+    + eapply E_Seq.
+      * apply H2.
+      * apply H3.
+    + assumption.
+Qed.
 (** [] *)
 
 (** Proving program properties involving assignments is one place
