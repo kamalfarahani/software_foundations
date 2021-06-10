@@ -788,7 +788,29 @@ Theorem CIf_congruence : forall b b' c1 c1' c2 c2',
   cequiv <{ if b then c1 else c2 end }>
          <{ if b' then c1' else c2' end }>.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b b' c1 c1' c2 c2'.
+  unfold bequiv.
+  unfold cequiv.
+  intros H1 H2 H3.
+  intros st st'.
+  split.
+  - intros H.
+    inversion H; subst.
+    + apply E_IfTrue.
+      * rewrite <- (H1 st). assumption.
+      * apply (H2 st st'). assumption.
+    + apply E_IfFalse.
+      * rewrite <- (H1 st). assumption.
+      * apply (H3 st st'). assumption.
+  - intros H.
+    inversion H; subst.
+    + apply E_IfTrue.
+      * rewrite (H1 st). assumption.
+      * apply (H2 st st'). assumption.
+    + apply E_IfFalse.
+      * rewrite (H1 st). assumption.
+      * apply (H3 st st'). assumption.
+Qed.
 (** [] *)
 
 (** For example, here are two equivalent programs and a proof of their
