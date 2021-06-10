@@ -765,7 +765,21 @@ Theorem CSeq_congruence : forall c1 c1' c2 c2',
   cequiv c1 c1' -> cequiv c2 c2' ->
   cequiv <{ c1;c2 }> <{ c1';c2' }>.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold cequiv.
+  intros c1 c1' c2 c2' H1 H2.
+  intros st st'.
+  split.
+  - intros H.
+    inversion H. subst.
+    eapply E_Seq.
+    + apply (H1 st st'0). assumption.
+    + apply (H2 st'0 st'). assumption.
+  - intros H.
+    inversion H. subst.
+    eapply E_Seq.
+    + apply (H1 st st'0). assumption.
+    + apply (H2 st'0 st'). assumption.
+Qed. 
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (CIf_congruence) *)
