@@ -1214,8 +1214,13 @@ Proof.
     + (* b always false *)
       apply trans_cequiv with c2; try assumption.
       apply if_false; assumption.
-  - (* while *)
-    (* FILL IN HERE *) Admitted.
+  - remember (fold_constants_bexp b) as b'  eqn:Heqb'.
+    assert (bequiv b b') as Hb.
+    { subst. apply fold_constants_bexp_sound. }
+    destruct b' eqn:E; try (apply CWhile_congruence; assumption; assumption).
+      + apply while_true. apply Hb.
+      + apply while_false. assumption.
+Qed.
 (** [] *)
 
 (* ----------------------------------------------------------------- *)
