@@ -354,7 +354,12 @@ Theorem hoare_post_true : forall (P Q : Assertion) c,
   (forall st, Q st) ->
   {{P}} c {{Q}}.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q c.
+  unfold hoare_triple.
+  intros H.
+  intros st st' H' H''.
+  apply H.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard (hoare_pre_false) *)
@@ -366,7 +371,13 @@ Theorem hoare_pre_false : forall (P Q : Assertion) c,
   (forall st, ~ (P st)) ->
   {{P}} c {{Q}}.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q c H.
+  unfold hoare_triple.
+  intros st st' H' H''.
+  apply H in H''.
+  exfalso.
+  assumption.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -618,7 +629,7 @@ Definition manual_grade_for_hoare_asgn_examples : option (nat*string) := None.
     [a], and your counterexample needs to exhibit an [a] for which
     the rule doesn't work.) *)
 
-(* FILL IN HERE *)
+(* If X := X + 1 then the rule does not work *)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_hoare_asgn_wrong : option (nat*string) := None.
@@ -648,7 +659,15 @@ Theorem hoare_asgn_fwd :
   {{fun st => P (X !-> m ; st)
            /\ st X = aeval (X !-> m ; st) a }}.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold hoare_triple.
+  intros m a P st st' HE HQ.
+  inversion HE. subst.
+  destruct HQ as [HQ1 HQ2].
+  rewrite <- HQ2.
+  split.
+  + rewrite t_update_shadow. rewrite t_update_same. assumption.
+  + rewrite t_update_shadow. rewrite t_update_same. rewrite t_update_eq. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, advanced, optional (hoare_asgn_fwd_exists)
