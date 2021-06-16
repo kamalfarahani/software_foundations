@@ -690,7 +690,16 @@ Theorem hoare_asgn_fwd_exists :
   {{fun st => exists m, P (X !-> m ; st) /\
                 st X = aeval (X !-> m ; st) a }}.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros a P.
+  unfold hoare_triple.
+  intros st st' HE HQ.
+  inversion HE. subst.
+  exists (st X).
+  rewrite t_update_shadow. rewrite t_update_same.
+  split.
+  - assumption.
+  - reflexivity.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
