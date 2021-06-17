@@ -1405,7 +1405,15 @@ Theorem if_minus_plus :
   end
   {{Y = X + Z}}.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  simpl.
+  apply hoare_if.
+  - eapply hoare_consequence_pre.
+    + apply hoare_asgn.
+    + assn_auto''.
+  - eapply hoare_consequence_pre.
+    + apply hoare_asgn.
+    + assn_auto''.
+Qed.
 (** [] *)
 
 (* ----------------------------------------------------------------- *)
