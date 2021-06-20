@@ -677,7 +677,20 @@ Qed.
     Write an informal decorated program showing that this procedure
     is correct, and justify each use of [->>]. *)
 
-(* FILL IN HERE *)
+(* 
+        {{ X = m }}
+      Y := 0;
+        {{ X + Y = m }}
+      while ~(X = 0) do
+          {{ X + Y = m }} ->>
+          {{ (X - 1) + (Y + 1) = m }}
+        X := X - 1;
+          {{ X + (Y + 1) = m }}
+        Y := Y + 1
+          {{ X + Y = m }}
+      end
+        {{ (X + Y = m) /\ ~ (~ (X = 0)) }} ->>
+        {{ Y = m }} *)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_decorations_in_slow_assignment : option (nat*string) := None.
