@@ -811,7 +811,39 @@ Theorem parity_correct : forall (m:nat),
   end
   {{  X = parity m }}.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros m.
+  simpl.
+  apply hoare_consequence_pre with (fun st: state => parity (st X) = parity m).
+  - eapply hoare_consequence_post.
+    + apply hoare_while.
+      * eapply hoare_consequence_pre.
+        ** apply hoare_asgn.
+        ** verify_assn.
+           rewrite <- H.
+           apply parity_ge_2.
+           destruct (st X).
+           *** discriminate H0.
+           *** destruct n.
+               ***** discriminate H0.
+               ***** lia.
+          
+    + unfold "->>".
+      intros st [H1 H2].
+      rewrite <- H1.
+      symmetry.
+      apply parity_lt_2.
+      intros H'.
+      simpl in H2.
+      destruct (st X).
+      * lia.
+      * destruct n.
+        ** lia.
+        ** unfold not in H2. apply H2. reflexivity.
+  - unfold "->>".
+    intros st H.
+    rewrite <- H.
+    reflexivity.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
