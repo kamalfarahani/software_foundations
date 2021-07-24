@@ -1052,24 +1052,24 @@ Definition manual_grade_for_decorations_in_factorial : option (nat*string) := No
 (**
 
   {{ True }} ->>
-  {{                    }}
+  {{ 0 + min a b = min a b  }}
   X := a;
-  {{                       }}
+  {{ 0 + min X b = min a b  }}
   Y := b;
-  {{                       }}
+  {{ 0 + min X Y = min a b }}
   Z := 0;
-  {{                       }}
+  {{ Z + min X Y = min a b }}
   while ~(X = 0) && ~(Y = 0) do
-    {{                                     }} ->>
-    {{                                }}
+    {{ (Z + min X Y = min a b) && X <> 0 && Y <> 0 }} ->>
+    {{ (Z + 1) + min (X - 1) (Y - 1) = min a b }}
     X := X - 1;
-    {{                            }}
+    {{ (Z + 1) + min X (Y - 1) = min a b }}
     Y := Y - 1;
-    {{                        }}
+    {{ (Z + 1) + min X Y = min a b }}
     Z := Z + 1
-    {{                       }}
+    {{ Z + min X Y = min a b }}
   end
-  {{                            }} ->>
+  {{ (Z + min X Y = min a b) && ~(X <> 0 && Y <> 0) }} ->>
   {{ Z = min a b }}
 *)
 
