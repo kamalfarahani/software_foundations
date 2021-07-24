@@ -1010,18 +1010,18 @@ Qed.
     Excluding both operations from your loop invariant is advisable.
 
     {{ X = m }} ->>
-    {{                                      }}
+    {{ 1 * X! = m! }}
   Y := 1;
-    {{                                      }}
+    {{ Y * X! = m! }}
   while ~(X = 0)
-  do   {{                                      }} ->>
-       {{                                      }}
+  do   {{ Y * X! = m! && X <> 0 }} ->>
+       {{ (Y * X) * (X - 1)! = m! }}
      Y := Y * X;
-       {{                                      }}
+       {{ Y * (X - 1)! = m! }}
      X := X - 1
-       {{                                      }}
+       {{ Y * X! = m! }}
   end
-    {{                                      }} ->>
+    {{ Y * X! = m! && X = 0 }} ->>
     {{ Y = m! }}
 
     Briefly justify each use of [->>].
