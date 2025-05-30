@@ -937,24 +937,38 @@ Abort.
 
 Lemma double_incr : forall n : nat, double (S n) = S (S (double n)).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  destruct n as [| n'] eqn:E.
+  - reflexivity.
+  - simpl. reflexivity.
+Qed.
 
 (** Now define a similar doubling function for [bin]. *)
 
-Definition double_bin (b:bin) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition double_bin (b:bin) : bin :=
+  match b with
+  | Z => Z
+  | _ => B0 b
+  end.
 
 (** Check that your function correctly doubles zero. *)
 
 Example double_bin_zero : double_bin Z = Z.
-(* FILL IN HERE *) Admitted.
+Proof.
+  reflexivity.
+Qed.
 
 (** Prove this lemma, which corresponds to [double_incr]. *)
 
 Lemma double_incr_bin : forall b,
     double_bin (incr b) = incr (incr (double_bin b)).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b.
+  destruct b as [| b'|b'] eqn:E.
+  - reflexivity.
+  - reflexivity.
+  - reflexivity.
+Qed.
 
 (** [] *)
 
@@ -975,7 +989,11 @@ Abort.
     [double_bin] that might have failed to satisfy [double_bin_zero]
     yet otherwise seem correct. *)
 
-(* FILL IN HERE *)
+(* This failure occurs because there can be multiple binary representations for the same natural number.
+   For example, the numbers 'B0 Z', 'B0 (B0 Z)', and so on, all represent zero, just with extra leading zeros.
+   When converting from binary to nat and back, the process produces the simplest or canonical representation,
+   which removes these redundant leading zeros. Therefore, we may not get back the original representation,
+   but we do get an equivalent one representing the same value. *)
 
 (** To solve that problem, we can introduce a _normalization_ function
     that selects the simplest [bin] out of all the equivalent
@@ -992,14 +1010,35 @@ Abort.
     end of the [bin] and process each bit only once. Do not try to
     "look ahead" at future bits. *)
 
-Fixpoint normalize (b:bin) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint normalize (b:bin) : bin :=
+  match b with
+  | Z => Z
+  | B1 b' => B1 (normalize b')
+  | B0 b' => double_bin (normalize b')
+  end.
+(** Check that your function correctly normalizes zero. *)
 
 (** It would be wise to do some [Example] proofs to check that your definition of
     [normalize] works the way you intend before you proceed. They won't be graded,
     but fill them in below. *)
 
-(* FILL IN HERE *)
+  Example normalize_B0Z : normalize (B0 Z) = Z.
+  Proof. reflexivity. Qed.
+  
+  Example normalize_B1Z : normalize (B1 Z) = B1 Z.
+  Proof. reflexivity. Qed.
+  
+  Example normalize_B0B1Z : normalize (B0 (B1 Z)) = B0 (B1 Z).
+  Proof. reflexivity. Qed.
+  
+  Example normalize_B0B0Z : normalize (B0 (B0 Z)) = Z.
+  Proof. reflexivity. Qed.
+  
+  Example normalize_B1B0Z : normalize (B1 (B0 Z)) = B1 Z.
+  Proof. reflexivity. Qed.
+  
+  Example normalize_B0B1B0Z : normalize (B0 (B1 (B0 Z))) = B0 (B1 Z).
+  Proof. reflexivity. Qed.
 
 (** Finally, prove the main theorem. The inductive cases could be a
     bit tricky.
@@ -1010,10 +1049,47 @@ Fixpoint normalize (b:bin) : bin
     progress. We have one lemma for the [B0] case (which also makes
     use of [double_incr_bin]) and another for the [B1] case. *)
 
-Theorem bin_nat_bin : forall b, nat_to_bin (bin_to_nat b) = normalize b.
+Lemma double_bin_is_double: forall n: nat,
+    nat_to_bin (double n) = double_bin (nat_to_bin n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  induction n as [| n' IHn'].
+  - reflexivity.
+  - simpl.
+    rewrite double_incr_bin.
+    rewrite IHn'.
+    reflexivity.
+Qed.
 
+Lemma incr_double_B1: forall b: bin,
+  incr (double_bin b) = B1 b.
+  intros b.
+  destruct b as [| b'| b'] eqn: E.
+  - reflexivity.
+  - reflexivity.
+  - reflexivity.
+Qed.
+
+Theorem bin_nat_bin : forall b,
+  nat_to_bin (bin_to_nat b) = normalize b.
+Proof.
+  intro b.
+  induction b as [| b' IHb'|b' IHb'].
+  - simpl. reflexivity.
+  - simpl.
+    rewrite add_0_r.
+    rewrite <- double_plus.
+    rewrite double_bin_is_double.
+    rewrite IHb'.
+    reflexivity.
+  - simpl.
+    rewrite add_0_r.
+    rewrite <- double_plus.
+    rewrite double_bin_is_double.
+    rewrite IHb'.
+    rewrite incr_double_B1.
+    reflexivity.
+Qed.
 (** [] *)
 
 (* 2025-01-13 16:00 *)
