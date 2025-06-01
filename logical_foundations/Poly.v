@@ -154,8 +154,16 @@ Inductive grumble (X:Type) : Type :=
       - [e bool true]
       - [e mumble (b c 0)]
       - [e bool (b c 0)]
-      - [c]  *)
-(* FILL IN HERE *)
+      - [c] 
+      
+      1. No
+      2. Yes
+      3. Yes
+      4. Yes
+      5. No
+      6. No
+*)
+
 End MumbleGrumble.
 (** [] *)
 
