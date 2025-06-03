@@ -77,7 +77,11 @@ Theorem silly_ex : forall p,
   even p = true ->
   odd (S p) = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros p H1 H2 H3.
+  apply H2.
+  apply H1.
+  apply H3.
+Qed.
 (** [] *)
 
 (** To use the [apply] tactic, the (conclusion of the) fact
@@ -108,11 +112,17 @@ Proof.
     that theorem as part of your (relatively short) solution to this
     exercise. You do not need [induction]. *)
 
+Search rev.
+
 Theorem rev_exercise1 : forall (l l' : list nat),
   l = rev l' ->
   l' = rev l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros l l' H.
+  rewrite H.
+  symmetry.
+  apply rev_involutive.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (apply_rewrite)
@@ -187,7 +197,7 @@ Example trans_eq_example'' : forall (a b c d e f : nat),
 Proof.
   intros a b c d e f eq1 eq2.
   transitivity [c;d].
-  apply eq1. apply eq2.   Qed.
+  apply eq1. apply eq2. Qed.
 
 (** **** Exercise: 3 stars, standard, optional (trans_eq_exercise) *)
 Example trans_eq_exercise : forall (n m o p : nat),
@@ -195,7 +205,11 @@ Example trans_eq_exercise : forall (n m o p : nat),
      (n + p) = m ->
      (n + p) = (minustwo o).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m o p eq1 eq2.
+  transitivity m.
+  apply eq2.
+  apply eq1.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -282,7 +296,14 @@ Example injection_ex3 : forall (X : Type) (x y z : X) (l j : list X),
   j = z :: l ->
   x = y.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X x y z l j H1 H2.
+  injection H1 as H1' H1''.
+  rewrite H1'.
+  rewrite H2 in H1''.
+  injection H1'' as H_final.
+  rewrite H_final.
+  reflexivity.
+Qed.
 (** [] *)
 
 (** So much for injectivity of constructors.  What about disjointness? *)
@@ -311,6 +332,17 @@ Theorem discriminate_ex2 : forall (n : nat),
 Proof.
   intros n contra. discriminate contra. Qed.
 
+Theorem discriminate_Sn_n : forall (n : nat),
+  S n = n -> true = false.
+Proof.
+  intros n contra.
+  induction n as [| n' IHn'].
+  - discriminate contra.
+  - injection contra as contra'.
+    apply IHn'.
+    apply contra'.
+Qed.
+
 (** These examples are instances of a logical principle known as the
     _principle of explosion_, which asserts that a contradictory
     hypothesis entails anything (even manifestly false things!). *)
@@ -332,7 +364,9 @@ Example discriminate_ex3 :
     x :: y :: l = [] ->
     x = z.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X x y z l j H.
+  discriminate H.
+Qed.
 (** [] *)
 
 (** For a more useful example, we can use [discriminate] to make a
