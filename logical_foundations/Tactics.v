@@ -566,6 +566,25 @@ Proof.
 
 Abort.
 
+(** Practice:  Try to prove [double_injective] using proper induction *)
+Theorem double_injective_practice : forall n m,
+  double n = double m ->
+  n = m.
+Proof.
+  intros n.
+  induction n as [| n' IHn'].
+  - intros m H. destruct m as [| m'] eqn:E.
+    + simpl in H. reflexivity.
+    + simpl in H. discriminate H.
+  - intros m H. destruct m as [| m'] eqn:E.
+    + simpl in H. discriminate H.
+    + simpl in H.
+      injection H as H'.
+      f_equal.
+      apply IHn' in H'.
+      apply H'.
+Qed.
+
 (** What went wrong? *)
 
 (** The problem is that, at the point where we invoke the
@@ -680,7 +699,18 @@ Proof.
 Theorem eqb_true : forall n m,
   n =? m = true -> n = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  induction n as [| n' IHn'].
+  - intros m H. destruct m as [| m'] eqn:E.
+    + reflexivity.
+    + simpl in H. discriminate H.
+  - intros m H. destruct m as [| m'] eqn:E.
+    + simpl in H. discriminate H.
+    + simpl in H.
+      apply IHn' in H.
+      f_equal.
+      apply H.
+Qed.  
 (** [] *)
 
 (** **** Exercise: 2 stars, advanced (eqb_true_informal)
@@ -689,7 +719,31 @@ Proof.
     hypothesis explicitly and being as explicit as possible about
     quantifiers, everywhere. *)
 
-(* FILL IN HERE *)
+(* Informal proof of eqb_true:
+
+We want to prove: For all natural numbers n and m, if n =? m = true, then n = m.
+
+Proof: We proceed by induction on n.
+
+Base case: n = 0. 
+We need to show: For all m, if 0 =? m = true, then 0 = m. 
+Consider m: 
+- If m = 0, then 0 =? 0 = true, so 0 = 0, which holds. 
+- If m = S m', then 0 =? S m' = false, so the premise is false and the implication holds vacuously.
+
+Inductive step: 
+Suppose n = S n', and assume as induction hypothesis (IH): 
+For all m, if n' =? m = true, then n' = m.
+
+We need to show: For all m, if S n' =? m = true, then S n' = m.
+Consider m: 
+- If m = 0, then S n' =? 0 = false, so the premise is false and the implication holds vacuously.
+- If m = S m', then S n' =? S m' = n' =? m'. If n' =? m' = true, then by IH, n' = m'. 
+  Therefore, S n' = S m', as required.
+
+Thus, by induction on n, the statement holds for all n and m.
+
+QED. *)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_informal_proof : option (nat*string) := None.
@@ -703,7 +757,26 @@ Theorem plus_n_n_injective : forall n m,
   n + n = m + m ->
   n = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  induction n as [| n' IHn'].
+  - intros m H.
+    simpl in H.
+    destruct m as [| m'] eqn:E.
+    + simpl in H. apply H.
+    + simpl in H. discriminate H.
+  - intros m H.
+    destruct m as [| m'] eqn:E.
+    + simpl in H.
+      discriminate H.
+    + simpl in H.
+      injection H as H.
+      rewrite <- plus_n_Sm in H.
+      rewrite <- plus_n_Sm in H.
+      injection H as H.
+      apply IHn' in H.
+      f_equal.
+      apply H.
+Qed.
 (** [] *)
 
 (** The strategy of doing fewer [intros] before an [induction] to
@@ -810,7 +883,20 @@ Theorem nth_error_after_last: forall (n : nat) (X : Type) (l : list X),
   length l = n ->
   nth_error l n = None.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n X l.
+  generalize dependent n.
+  induction l as [| h t IHt].
+  - intros n H.
+    simpl. reflexivity.
+  - intros n H.
+    simpl in H.
+    destruct n as [| n'] eqn:E.
+    + discriminate H.
+    + simpl.
+      injection H as H.
+      apply IHt in H.
+      apply H.
+Qed.  
 (** [] *)
 
 (* ################################################################# *)
@@ -998,7 +1084,30 @@ Theorem combine_split : forall X Y (l : list (X * Y)) l1 l2,
   split l = (l1, l2) ->
   combine l1 l2 = l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X Y l.
+  induction l as [| h t IHt].
+  - intros l1 l2 H.
+    simpl in H.
+    injection H as H1 H2.
+    rewrite <- H1.
+    rewrite <- H2.
+    reflexivity.
+  - intros l1 l2 H.
+    simpl in H.
+    destruct h as (x, y).
+    + destruct (split t) as (lx, ly).
+      injection H as H1 H2.
+      rewrite <- H1.
+      rewrite <- H2.
+      simpl.
+      assert (H': combine lx ly = t).
+      {
+        apply IHt.
+        reflexivity.
+      }
+      rewrite H'.
+      reflexivity.
+Qed.
 (** [] *)
 
 (** The [eqn:] part of the [destruct] tactic is optional; although
@@ -1073,7 +1182,29 @@ Theorem bool_fn_applied_thrice :
   forall (f : bool -> bool) (b : bool),
   f (f (f b)) = f b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros f b.
+  destruct b as [|] eqn:Eb.
+  - destruct (f true) as [|] eqn:Ef_true.
+    + rewrite Ef_true.
+      rewrite Ef_true.
+      reflexivity.
+    + destruct (f false) as [|] eqn:Ef_false.
+      ++ rewrite Ef_true.
+         reflexivity.
+      ++ rewrite Ef_false.
+         reflexivity.
+  - destruct (f false) as [|] eqn:Ef_false.
+    + destruct (f true) as [|] eqn:Ef_true.
+      ++ rewrite Ef_true.
+         reflexivity.
+      ++ rewrite Ef_false.
+         reflexivity.
+    + rewrite Ef_false.
+      rewrite Ef_false.
+      reflexivity.
+Qed.
+
+     
 (** [] *)
 
 (* ################################################################# *)
@@ -1154,7 +1285,19 @@ Proof.
 Theorem eqb_sym : forall (n m : nat),
   (n =? m) = (m =? n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  induction n as [| n' IHn'].
+  - intros m.
+    simpl.
+    destruct m as [| m'] eqn:Em.
+    + simpl. reflexivity.
+    + simpl. reflexivity.
+  - intros m.
+    simpl.
+    destruct m as [| m'] eqn:Em.
+    + simpl. reflexivity.
+    + simpl. apply IHn'.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced, optional (eqb_sym_informal)
@@ -1175,7 +1318,18 @@ Theorem eqb_trans : forall n m p,
   m =? p = true ->
   n =? p = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m p H1 H2.
+  apply eqb_true in H1.
+  apply eqb_true in H2.
+  assert (H': n = p).
+  {
+    transitivity m.
+    apply H1.
+    apply H2.
+  }
+  rewrite H'.
+  apply eqb_refl.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced (split_combine)
@@ -1189,14 +1343,46 @@ Proof.
     Your property will need to account for the behavior of [combine]
     in its base cases, which possibly drop some list elements. *)
 
-Definition split_combine_statement : Prop
-  (* ("[: Prop]" means that we are giving a name to a
-     logical proposition here.) *)
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+
+Definition min (x y : nat) : nat :=
+  if x <=? y
+  then x
+  else y.
+
+Fixpoint take_list {A : Type} (n : nat) (l : list A) : list A :=
+  match n, l with
+  | S n', cons x l' => cons x (take_list n' l')
+  | 0, _ => nil
+  | _, nil => nil
+  end.
+
+Definition split_combine_statement : Prop :=
+  forall (X : Type) (Y : Type) (m: nat) (l1 : list X) (l2 : list Y) (l : list (X * Y)),
+  m = min (length l1) (length l2) ->
+  combine l1 l2 = l ->
+  split l = (take_list m l1, take_list m l2).
 
 Theorem split_combine : split_combine_statement.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros X Y m l1.
+  induction l1 as [| h t IHt].
+  - intros l2 l H1 H2.
+    simpl in H1.
+    assert (H': forall (n: nat), min 0 n = 0).
+    {
+      intros n.
+      destruct n as [| n'] eqn:En.
+      - reflexivity.
+      - reflexivity.
+    }
+    rewrite H' in H1.
+    rewrite H1.
+    simpl.
+    simpl in H2.
+    rewrite <- H2.
+    reflexivity.
+  - intros l2 l H1 H2.
+    simpl in H1.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_split_combine : option (nat*string) := None.
