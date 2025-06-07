@@ -1343,46 +1343,113 @@ Qed.
     Your property will need to account for the behavior of [combine]
     in its base cases, which possibly drop some list elements. *)
 
-
-Definition min (x y : nat) : nat :=
-  if x <=? y
-  then x
-  else y.
-
-Fixpoint take_list {A : Type} (n : nat) (l : list A) : list A :=
+Fixpoint take_list {X : Type} (n : nat) (l : list X) : list X :=
   match n, l with
-  | S n', cons x l' => cons x (take_list n' l')
-  | 0, _ => nil
   | _, nil => nil
+  | 0, _ => nil
+  | S n', cons x l' => cons x (take_list n' l')
   end.
 
-Definition split_combine_statement : Prop :=
-  forall (X : Type) (Y : Type) (m: nat) (l1 : list X) (l2 : list Y) (l : list (X * Y)),
-  m = min (length l1) (length l2) ->
-  combine l1 l2 = l ->
-  split l = (take_list m l1, take_list m l2).
 
-Theorem split_combine : split_combine_statement.
+Definition split_combine_statement : Prop :=
+  forall 
+    (X : Type) 
+    (Y : Type) 
+    (l1 : list X) 
+    (l2 : list Y)
+    (l1' : list X)
+    (l2' : list Y)
+    (l : list (X * Y)) 
+    (m : nat),
+  m = min (length l1) (length l2) ->
+  l1' = take_list m l1 ->
+  l2' = take_list m l2 ->
+  combine l1' l2' = l ->
+  split l = (l1', l2').
+
+Theorem weak_split_combine :
+  forall (X : Type) (Y : Type) (l1 : list X) (l2 : list Y) (l : list (X * Y)),
+  length l1 = length l2 ->
+  combine l1 l2 = l ->
+  split l = (l1, l2).
 Proof.
-  intros X Y m l1.
+  intros X Y l1.
   induction l1 as [| h t IHt].
-  - intros l2 l H1 H2.
+  - intros l2 l H_len H1.
     simpl in H1.
-    assert (H': forall (n: nat), min 0 n = 0).
-    {
-      intros n.
-      destruct n as [| n'] eqn:En.
-      - reflexivity.
-      - reflexivity.
-    }
-    rewrite H' in H1.
-    rewrite H1.
+    rewrite <- H1.
     simpl.
-    simpl in H2.
-    rewrite <- H2.
-    reflexivity.
-  - intros l2 l H1 H2.
+    f_equal.
+    destruct l2 as [| h' t'] eqn:Eq_l2.
+    + reflexivity.
+    + simpl in H_len.
+      discriminate H_len.
+  - intros l2 l H_len H1.
     simpl in H1.
+    destruct l2 as [| h' t'].
+    + rewrite <- H1.
+      simpl.
+      f_equal.
+      simpl in H_len.
+      discriminate H_len.
+    + simpl in H1.
+      destruct l.
+      ++ discriminate H1.
+      ++ injection H1 as H1' H1''.
+         apply IHt in H1''.
+         simpl.
+         rewrite <- H1'.
+         rewrite H1''.
+         reflexivity.
+         simpl in H_len.
+         injection H_len as H_len'.
+         apply H_len'.
+Qed.
+
+Lemma min_take_length: 
+  forall (X : Type) (Y : Type) (l1 : list X) (l2 : list Y) (n : nat),
+  n = min (length l1) (length l2) ->
+  length (take_list n l1) = length (take_list n l2).
+Proof.
+  intros X Y l1.
+  induction l1 as [| h t IHt].
+  - intros l2 n H.
+    simpl in H.
+    rewrite H.
+    simpl.
+    destruct l2.
+    + reflexivity.
+    + reflexivity.
+  - intros l2 n H.
+    simpl in H.
+    destruct l2.
+    + simpl in H.
+      rewrite H.
+      simpl.
+      reflexivity.
+    + simpl in H.
+      rewrite H.
+      simpl.
+      f_equal.
+      apply IHt.
+      reflexivity.
+Qed.
+
+Theorem split_combine :
+  split_combine_statement.
+Proof.
+  intros X Y l1 l2 l1' l2' l m H1 H2 H3 H4.
+  assert (H': length l1' = length l2').
+  {
+    rewrite H2.
+    rewrite H3.
+    apply min_take_length.
+    apply H1.
+  }
+  apply weak_split_combine.
+  - apply H'.
+  - apply H4.
+Qed.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_split_combine : option (nat*string) := None.
@@ -1394,7 +1461,20 @@ Theorem filter_exercise : forall (X : Type) (test : X -> bool)
   filter test l = x :: lf ->
   test x = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X test x l.
+  induction l as [| h t IHt].
+  - intros lf H.
+    simpl in H.
+    discriminate H.
+  - intros lf H.
+    simpl in H.
+    destruct (test h) as [|] eqn:Eq_test.
+    + injection H as H1 H2.
+      rewrite <- H1.
+      apply Eq_test.
+    + apply IHt in H.
+      apply H.
+Qed.
 (** [] *)
 
 (** **** Exercise: 4 stars, advanced, especially useful (forall_exists_challenge)
@@ -1423,43 +1503,60 @@ Proof.
     [existsb'] and [existsb] have the same behavior.
 *)
 
-Fixpoint forallb {X : Type} (test : X -> bool) (l : list X) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint forallb {X : Type} (test : X -> bool) (l : list X) : bool :=
+  match l with
+  | [] => true
+  | h :: t => test h && forallb test t
+  end.
 
 Example test_forallb_1 : forallb odd [1;3;5;7;9] = true.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 
 Example test_forallb_2 : forallb negb [false;false] = true.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 
 Example test_forallb_3 : forallb even [0;2;4;5] = false.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 
 Example test_forallb_4 : forallb (eqb 5) [] = true.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 
-Fixpoint existsb {X : Type} (test : X -> bool) (l : list X) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint existsb {X : Type} (test : X -> bool) (l : list X) : bool :=
+  match l with
+  | [] => false
+  | h :: t => test h || existsb test t
+  end.
 
 Example test_existsb_1 : existsb (eqb 5) [0;2;3;6] = false.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 
 Example test_existsb_2 : existsb (andb true) [true;true;false] = true.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 
 Example test_existsb_3 : existsb odd [1;0;0;0;0;3] = true.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 
 Example test_existsb_4 : existsb even [] = false.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 
-Definition existsb' {X : Type} (test : X -> bool) (l : list X) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition existsb' {X : Type} (test : X -> bool) (l : list X) : bool :=
+  negb (forallb (fun b => negb (test b)) l).
 
 Theorem existsb_existsb' : forall (X : Type) (test : X -> bool) (l : list X),
   existsb test l = existsb' test l.
-Proof. (* FILL IN HERE *) Admitted.
-
+Proof.
+  intros X test l.
+  induction l as [| h t IHt].
+  - reflexivity.
+  - unfold existsb'.
+    simpl.
+    destruct (test h) as [|] eqn:Eq_test.
+    + simpl. reflexivity.
+    + simpl.
+      rewrite IHt.
+      unfold existsb'.
+      reflexivity.
+Qed.
 (** [] *)
 
 (* 2025-01-13 16:00 *)
