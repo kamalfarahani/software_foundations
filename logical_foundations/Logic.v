@@ -144,7 +144,18 @@ Qed.
 Example plus_is_O :
   forall n m : nat, n + m = 0 -> n = 0 /\ m = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m H.
+  split.
+  - destruct n as [| n'] eqn:Eq_n.
+    + reflexivity.
+    + simpl in H. discriminate H.
+  - destruct m as [| m'] eqn:Eq_m.
+    + reflexivity.
+    + rewrite add_comm in H.
+      simpl in H.
+      discriminate H.
+Qed.
+    
 (** [] *)
 
 (** So much for proving conjunctive statements.  To go in the other
@@ -222,7 +233,9 @@ Proof.
 Lemma proj2 : forall P Q : Prop,
   P /\ Q -> Q.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q HPQ.
+  destruct HPQ as [HP HQ].
+  apply HQ.  Qed.
 (** [] *)
 
 (** Finally, we sometimes need to rearrange the order of conjunctions
@@ -248,7 +261,12 @@ Theorem and_assoc : forall P Q R : Prop,
   P /\ (Q /\ R) -> (P /\ Q) /\ R.
 Proof.
   intros P Q R [HP [HQ HR]].
-  (* FILL IN HERE *) Admitted.
+  split.
+    - split.
+      + apply HP.
+      + apply HQ.
+    - apply HR.
+Qed.
 (** [] *)
 
 (** Finally, the infix notation [/\] is actually just syntactic sugar for
@@ -320,14 +338,24 @@ Qed.
 Lemma mult_is_O :
   forall n m, n * m = 0 -> n = 0 \/ m = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m H.
+  destruct n as [|n'] eqn:Eq_n.
+    - left. reflexivity.
+    - right.
+      destruct m as [|m'] eqn:Eq_m.
+        + reflexivity.
+        + simpl in H. discriminate H.  
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard (or_commut) *)
 Theorem or_commut : forall P Q : Prop,
   P \/ Q  -> Q \/ P.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q [HP | HQ].
+  - right. apply HP.
+  - left. apply HQ.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -386,7 +414,10 @@ Proof.
 Theorem not_implies_our_not : forall (P:Prop),
   ~ P -> (forall (Q:Prop), P -> Q).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Hcontra Q HP.
+  apply Hcontra in HP.
+  destruct HP.
+Qed.
 (** [] *)
 
 (** Inequality is a very common form of negated statement, so there is a
@@ -454,14 +485,24 @@ Definition manual_grade_for_double_neg_informal : option (nat*string) := None.
 Theorem contrapositive : forall (P Q : Prop),
   (P -> Q) -> (~Q -> ~P).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q P_then_Q HNQ HP.
+  unfold not in HNQ.
+  apply HNQ.
+  apply P_then_Q.
+  apply HP.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard (not_both_true_and_false) *)
 Theorem not_both_true_and_false : forall P : Prop,
   ~ (P /\ ~P).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P.
+  unfold not.
+  intros [HP HNP].
+  apply HNP in HP.
+  destruct HP.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, advanced (not_PNP_informal)
@@ -469,7 +510,14 @@ Proof.
     Write an informal proof (in English) of the proposition [forall P
     : Prop, ~(P /\ ~P)]. *)
 
-(* FILL IN HERE *)
+(* We know that ~P is equivalent to P -> False.
+   Therefore, ~(P /\ ~P) means (P /\ ~P) -> False.
+   If we assume the hypothesis H = (P /\ ~P),
+   then we have both P and ~P.
+   Since ~P is P -> False, we now have both P and (P -> False).
+   By applying P to (P -> False), we derive False.
+   This completes our proof of ~(P /\ ~P).
+*)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_not_PNP_informal : option (nat*string) := None.
@@ -486,7 +534,18 @@ Definition manual_grade_for_not_PNP_informal : option (nat*string) := None.
 Theorem de_morgan_not_or : forall (P Q : Prop),
     ~ (P \/ Q) -> ~P /\ ~Q.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q H.
+  unfold not in H.
+  split.
+  - intros HP.
+    apply H.
+    left.
+    apply HP.
+  - intros HQ.
+    apply H.
+    right.
+    apply HQ.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (not_S_inverse_pred)
@@ -495,7 +554,10 @@ Proof.
     [S] and [pred] are inverses of each other: *)
 Lemma not_S_pred_n : ~(forall n : nat, S (pred n) = n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros H.
+  specialize H with ( n:=0 ).
+  discriminate H.
+Qed.
 (** [] *)
 
 (** Since inequality involves a negation, it also requires a little
@@ -590,9 +652,21 @@ Qed.
 (** Use the same technique as above to show that [nil <> x :: xs].
     Do not use the [discriminate] tactic. *)
 
+Definition disc_fn2 {X} (l : list X) : Prop :=
+  match l with
+  | nil => True
+  | _ => False
+  end.
+
 Theorem nil_is_not_cons : forall X (x : X) (xs : list X), ~ (nil = x :: xs).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X x xs contra.
+  assert (H: disc_fn2  ([] : list X)).
+  { simpl. reflexivity. }
+  rewrite contra in H.
+  simpl in H.
+  apply H.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -655,19 +729,50 @@ Qed.
 Theorem iff_refl : forall P : Prop,
   P <-> P.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P.
+  split.
+  - intros HP. apply HP.
+  - intros HP. apply HP.
+Qed.
 
 Theorem iff_trans : forall P Q R : Prop,
   (P <-> Q) -> (Q <-> R) -> (P <-> R).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q R H_iff_PQ H_iff_QR.
+  split.
+    - intros HP.
+      apply H_iff_PQ in HP as HQ.
+      apply H_iff_QR in HQ as HR.
+      apply HR.
+    - intros HR.
+      apply H_iff_QR in HR as HQ.
+      apply H_iff_PQ in HQ as HP.
+      apply HP.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (or_distributes_over_and) *)
 Theorem or_distributes_over_and : forall P Q R : Prop,
   P \/ (Q /\ R) <-> (P \/ Q) /\ (P \/ R).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q R.
+  split.
+  - intros [HP | [HQ HR]].
+    + split.
+      ++ left. apply HP.
+      ++ left. apply HP.
+    + split.
+      ++ right. apply HQ.
+      ++ right. apply HR.
+  - intros [[HP | HQ] [HP' | HR]].
+    + left. apply HP.
+    + left. apply HP.
+    + left. apply HP'.
+    + right.
+      split.
+      ++ apply HQ.
+      ++ apply HR.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
