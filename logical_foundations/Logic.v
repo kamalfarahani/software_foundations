@@ -882,7 +882,13 @@ Proof.
 Theorem dist_not_exists : forall (X:Type) (P : X -> Prop),
   (forall x, P x) -> ~ (exists x, ~ P x).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X P H.
+  unfold not.
+  intros [x H_contra].
+  apply H_contra.
+  specialize H with (x:=x).
+  apply H.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (dist_exists_or)
@@ -893,17 +899,103 @@ Proof.
 Theorem dist_exists_or : forall (X:Type) (P Q : X -> Prop),
   (exists x, P x \/ Q x) <-> (exists x, P x) \/ (exists x, Q x).
 Proof.
-   (* FILL IN HERE *) Admitted.
+  intros X P Q.
+  split.
+  - intros [x H].
+    destruct H.
+    + left.
+      exists x.
+      apply H.
+    + right.
+      exists x.
+      apply H.
+  - intros H.
+    destruct H.
+    + destruct H as [x H'].
+      ++ exists x.
+        left.
+        apply H'.
+    + destruct H as [x H'].
+      ++ exists x.
+         right.
+         apply H'.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (leb_plus_exists) *)
+
+Lemma Sn_is_bigger_than_n: forall n : nat,
+  S n <=? n = false.
+  intros n.
+  induction n as  [| n' IHn'].
+  - simpl.
+    reflexivity.
+  - simpl.
+    apply IHn'.
+Qed.
+
+Lemma if_Sn_le_m_then_n_le_m: forall n m: nat,
+  S n <=? m = true -> n <=? m = true.
+  intros n.
+  induction n as [| n' IHn'].
+  - intros m H.
+    simpl.
+    reflexivity.
+  - intros m H.
+    destruct m as [| m'].
+    + simpl.
+      simpl in H.
+      apply H.
+    + simpl.
+      simpl in H.
+      apply IHn' in H.
+      apply H.
+Qed.
+
 Theorem leb_plus_exists : forall n m, n <=? m = true -> exists x, m = n+x.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros n m H.
+  induction n as [| n' IHn'].
+  - simpl.
+    exists m.
+    reflexivity.
+  - assert (H': n' <=? m = true).
+    {
+      apply if_Sn_le_m_then_n_le_m.
+      apply H.
+    }
+    apply IHn' in H'.
+    destruct H' as [x H_eq].
+    destruct x as [| x'] eqn:E.
+    + rewrite add_comm in H_eq.
+      simpl in H_eq.
+      rewrite H_eq in H.
+      rewrite Sn_is_bigger_than_n in H.
+      discriminate H.
+    + exists x'.
+      simpl.
+      rewrite add_comm in H_eq.
+      simpl in H_eq.
+      rewrite add_comm in H_eq.
+      apply H_eq.  
+Qed.
 
-Theorem plus_exists_leb : forall n m, (exists x, m = n+x) -> n <=? m = true.
+Theorem plus_exists_leb : forall n m, (exists x, m = n + x) -> n <=? m = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n .
+  induction n as [| n' IHn'].
+  - intros m [x H]. reflexivity.
+  - intros m [x H].
+    simpl.
+    destruct m as [| m'].
+    + simpl in H.
+      discriminate H.
+    + simpl in H.
+      injection H as H'.
+      apply IHn'.
+      exists x.
+      apply H'.
+Qed.
 
 (** [] *)
 
